@@ -231,11 +231,13 @@ export default function PlaybookGraph({ steps, stepStatuses, onNodeClick, onEdge
         >
           <Background color="#334155" gap={20} />
           <Controls className="!bg-slate-800 !border-slate-600 [&>button]:!bg-slate-700 [&>button]:!border-slate-600 [&>button]:!text-white" />
-          <MiniMap
-            className="!bg-slate-800 !border-slate-600"
-            nodeColor={() => "#3b82f6"}
-            maskColor="rgba(0,0,0,0.5)"
-          />
+          {!interactive && (
+            <MiniMap
+              className="!bg-slate-800 !border-slate-600"
+              nodeColor={() => "#3b82f6"}
+              maskColor="rgba(0,0,0,0.5)"
+            />
+          )}
         </ReactFlow>
       </div>
     </ReactFlowProvider>
