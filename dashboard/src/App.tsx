@@ -3,8 +3,13 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AppShell from "./components/AppShell";
 import { AuthProvider } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
+import ExecutionView from "./pages/ExecutionView";
+import Executions from "./pages/Executions";
 import Login from "./pages/Login";
 import Placeholder from "./pages/Placeholder";
+import PlaybookDetail from "./pages/PlaybookDetail";
+import PlaybookEditPage from "./pages/PlaybookEditPage";
+import Playbooks from "./pages/Playbooks";
 import UseCaseDetail from "./pages/UseCaseDetail";
 import UseCaseEditor from "./pages/UseCaseEditor";
 import UseCases from "./pages/UseCases";
@@ -28,10 +33,12 @@ export default function App() {
               <Route path="use-cases/new" element={<UseCaseEditor />} />
               <Route path="use-cases/:id" element={<UseCaseDetail />} />
               <Route path="use-cases/:id/edit" element={<UseCaseEditor />} />
-              <Route path="playbooks" element={<Placeholder title="Playbooks" />} />
-              <Route path="playbooks/:id" element={<Placeholder title="Playbook Detail" />} />
-              <Route path="executions" element={<Placeholder title="Executions" />} />
-              <Route path="executions/:id" element={<Placeholder title="Execution Detail" />} />
+              <Route path="playbooks" element={<Playbooks />} />
+              <Route path="playbooks/new" element={<PlaybookEditPage />} />
+              <Route path="playbooks/:id" element={<PlaybookDetail />} />
+              <Route path="playbooks/:id/edit" element={<PlaybookEditPage />} />
+              <Route path="executions" element={<Executions />} />
+              <Route path="executions/:id" element={<ExecutionView />} />
               <Route path="alerts" element={<Placeholder title="Alerts" />} />
               <Route path="coverage" element={<Placeholder title="MITRE Coverage" />} />
               <Route path="connectors" element={<Placeholder title="Connectors" />} />
