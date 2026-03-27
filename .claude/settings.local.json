@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m venv .venv)",
+      "Bash(source .venv/Scripts/activate)",
+      "Bash(pip install:*)",
+      "Bash(ruff check:*)",
+      "Bash(python -c \"import akeso_soar; import akeso_soar.api; import akeso_soar.engine; import akeso_soar.connectors; import akeso_soar.models; import akeso_soar.services; print\\(''All imports resolve successfully''\\)\")",
+      "Bash(docker compose:*)",
+      "Bash(alembic init:*)",
+      "Bash(alembic revision:*)",
+      "Bash(python -c \"from passlib.hash import bcrypt; print\\(bcrypt.hash\\(''admin''\\)\\)\")",
+      "Bash(python -c \"import bcrypt; print\\(bcrypt.hashpw\\(b''admin'', bcrypt.gensalt\\(\\)\\).decode\\(\\)\\)\")",
+      "Bash(python -c \":*)",
+      "Bash(timeout 5 uvicorn akeso_soar.app:create_app --factory --host 127.0.0.1 --port 8000)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
