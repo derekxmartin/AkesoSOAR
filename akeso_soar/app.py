@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
+from akeso_soar.api.alerts import router as alerts_router
 from akeso_soar.api.audit import router as audit_router
 from akeso_soar.api.auth import router as auth_router
 from akeso_soar.api.coverage import router as coverage_router
@@ -16,6 +17,7 @@ from akeso_soar.api.users import router as users_router
 from akeso_soar.config import settings
 from akeso_soar.db import engine
 from akeso_soar.logging import get_logger, setup_logging
+from akeso_soar.services.alert_poller import start_poller, stop_poller
 
 logger = get_logger(__name__)
 
@@ -24,7 +26,9 @@ logger = get_logger(__name__)
 async def lifespan(app: FastAPI):
     setup_logging()
     logger.info("akeso_soar.startup", env=settings.app_env)
+    start_poller()
     yield
+    stop_poller()
     await engine.dispose()
     logger.info("akeso_soar.shutdown")
 
@@ -47,6 +51,7 @@ def create_app() -> FastAPI:
 
     app.include_router(auth_router)
     app.include_router(users_router)
+    app.include_router(alerts_router)
     app.include_router(use_cases_router)
     app.include_router(playbooks_router)
     app.include_router(executions_router)
