@@ -9,6 +9,8 @@ from sqlalchemy import text
 from akeso_soar.api.audit import router as audit_router
 from akeso_soar.api.auth import router as auth_router
 from akeso_soar.api.coverage import router as coverage_router
+from akeso_soar.api.executions import router as executions_router
+from akeso_soar.api.playbooks import router as playbooks_router
 from akeso_soar.api.use_cases import router as use_cases_router
 from akeso_soar.api.users import router as users_router
 from akeso_soar.config import settings
@@ -46,6 +48,8 @@ def create_app() -> FastAPI:
     app.include_router(auth_router)
     app.include_router(users_router)
     app.include_router(use_cases_router)
+    app.include_router(playbooks_router)
+    app.include_router(executions_router)
     app.include_router(audit_router)
     app.include_router(coverage_router)
 
