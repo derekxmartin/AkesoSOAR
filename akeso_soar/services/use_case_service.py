@@ -51,7 +51,7 @@ async def create_use_case(
     sigma_rule_ids: list[str] | None = None,
     siem_alert_query: str | None = None,
     severity_threshold: Severity | None = None,
-    data_sources_required: dict | None = None,
+    data_sources_required: list | dict | None = None,
     escalation_policy: EscalationPolicy = EscalationPolicy.MANUAL,
     notification_channels: list[str] | None = None,
     summary: str = "",

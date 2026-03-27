@@ -13,8 +13,11 @@ from akeso_soar.api.rbac import Permission, require_permissions
 from akeso_soar.dependencies import get_db
 from akeso_soar.models.enums import EscalationPolicy, Severity, UseCaseStatus
 from akeso_soar.services import use_case_service
+from akeso_soar.services.data_source_health import check_use_case_health
+from akeso_soar.services.review_scheduler import get_overdue_use_cases, record_review
 from akeso_soar.services.use_case_diff import get_version_diff
 from akeso_soar.services.use_case_lifecycle import TransitionError, transition_use_case
+from akeso_soar.services.use_case_playbook_link import get_linked_playbooks, link_playbook, unlink_playbook
 
 router = APIRouter(prefix="/api/v1/use-cases", tags=["use-cases"])
 
@@ -35,7 +38,7 @@ class UseCaseCreate(BaseModel):
     sigma_rule_ids: list[str] = []
     siem_alert_query: str | None = None
     severity_threshold: Severity | None = None
-    data_sources_required: dict | None = None
+    data_sources_required: list | dict | None = None
     escalation_policy: EscalationPolicy = EscalationPolicy.MANUAL
     notification_channels: list[str] = []
     summary: str = ""
@@ -56,7 +59,7 @@ class UseCaseUpdate(BaseModel):
     sigma_rule_ids: list[str] | None = None
     siem_alert_query: str | None = None
     severity_threshold: Severity | None = None
-    data_sources_required: dict | None = None
+    data_sources_required: list | dict | None = None
     escalation_policy: EscalationPolicy | None = None
     notification_channels: list[str] | None = None
     summary: str | None = None
@@ -84,7 +87,7 @@ class UseCaseOut(BaseModel):
     sigma_rule_ids: list[str]
     siem_alert_query: str | None
     severity_threshold: Severity | None
-    data_sources_required: dict | None
+    data_sources_required: list | dict | None
     escalation_policy: EscalationPolicy
     notification_channels: list[str]
     summary: str
@@ -143,11 +146,16 @@ async def list_use_cases(
     owner_id: uuid.UUID | None = Query(None),
     mitre_tactic: str | None = Query(None),
     search: str | None = Query(None),
+    overdue: bool = Query(False),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
     _: dict = Depends(require_permissions(Permission.VIEW_USE_CASES)),
 ):
+    if overdue:
+        items = await get_overdue_use_cases(db)
+        return PaginatedUseCaseResponse(items=items, total=len(items), page=1, limit=len(items) or 1)
+
     items, total = await use_case_service.list_use_cases(
         db,
         status=status_filter,
@@ -259,3 +267,112 @@ async def diff_versions(
     if "error" in result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=result["error"])
     return result
+
+
+# ---------------------------------------------------------------------------
+# Health
+# ---------------------------------------------------------------------------
+
+
+@router.get("/{use_case_id}/health")
+async def use_case_health(
+    use_case_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    _: dict = Depends(require_permissions(Permission.VIEW_USE_CASES)),
+):
+    uc = await use_case_service.get_use_case(db, use_case_id)
+    if uc is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Use case not found")
+    return await check_use_case_health(uc)
+
+
+# ---------------------------------------------------------------------------
+# Review
+# ---------------------------------------------------------------------------
+
+
+class ReviewRequest(BaseModel):
+    notes: str = ""
+
+
+@router.post("/{use_case_id}/review", response_model=UseCaseOut)
+async def review_use_case(
+    use_case_id: uuid.UUID,
+    body: ReviewRequest,
+    db: AsyncSession = Depends(get_db),
+    payload: dict = Depends(require_permissions(Permission.MANAGE_USE_CASES)),
+):
+    uc = await use_case_service.get_use_case(db, use_case_id)
+    if uc is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Use case not found")
+
+    actor_id = uuid.UUID(payload["sub"])
+    uc = await record_review(db, uc, actor_id=actor_id, notes=body.notes)
+    return uc
+
+
+# ---------------------------------------------------------------------------
+# Playbook linking
+# ---------------------------------------------------------------------------
+
+
+class PlaybookLinkRequest(BaseModel):
+    playbook_id: uuid.UUID
+
+
+class LinkedPlaybookOut(BaseModel):
+    id: uuid.UUID
+    name: str
+    version: int
+    enabled: bool
+
+    model_config = {"from_attributes": True}
+
+
+@router.get("/{use_case_id}/playbooks", response_model=list[LinkedPlaybookOut])
+async def list_linked_playbooks(
+    use_case_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    _: dict = Depends(require_permissions(Permission.VIEW_USE_CASES)),
+):
+    uc = await use_case_service.get_use_case(db, use_case_id)
+    if uc is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Use case not found")
+    return await get_linked_playbooks(db, use_case_id)
+
+
+@router.post("/{use_case_id}/playbooks", status_code=status.HTTP_201_CREATED)
+async def link_playbook_to_use_case(
+    use_case_id: uuid.UUID,
+    body: PlaybookLinkRequest,
+    db: AsyncSession = Depends(get_db),
+    payload: dict = Depends(require_permissions(Permission.MANAGE_USE_CASES)),
+):
+    uc = await use_case_service.get_use_case(db, use_case_id)
+    if uc is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Use case not found")
+
+    actor_id = uuid.UUID(payload["sub"])
+    try:
+        await link_playbook(db, uc, body.playbook_id, actor_id=actor_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+    return {"status": "linked"}
+
+
+@router.delete("/{use_case_id}/playbooks/{playbook_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def unlink_playbook_from_use_case(
+    use_case_id: uuid.UUID,
+    playbook_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    payload: dict = Depends(require_permissions(Permission.MANAGE_USE_CASES)),
+):
+    uc = await use_case_service.get_use_case(db, use_case_id)
+    if uc is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Use case not found")
+
+    actor_id = uuid.UUID(payload["sub"])
+    try:
+        await unlink_playbook(db, uc, playbook_id, actor_id=actor_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e

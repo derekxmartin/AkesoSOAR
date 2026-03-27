@@ -163,4 +163,10 @@ async def transition_use_case(
         after_state=after,
     )
 
+    # Auto-disable linked playbooks on deprecation
+    if to_status == UseCaseStatus.DEPRECATED:
+        from akeso_soar.services.use_case_playbook_link import disable_linked_playbooks
+
+        await disable_linked_playbooks(db, uc, actor_id=actor_id)
+
     return uc
