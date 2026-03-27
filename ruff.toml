@@ -16,6 +16,7 @@ select = [
 ]
 ignore = [
     "E501",  # line length handled by formatter
+    "B008",  # Depends() in function defaults is standard FastAPI pattern
 ]
 
 [lint.isort]
