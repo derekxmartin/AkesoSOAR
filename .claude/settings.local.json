@@ -23,7 +23,8 @@
       "Bash(git checkout:*)",
       "Bash(gh pr:*)",
       "Bash(git stash:*)",
-      "Bash(curl -s -X POST http://127.0.0.1:8007/api/v1/auth/login -H \"Content-Type: application/json\" -d '{\"\"\"\"username\"\"\"\":\"\"\"\"admin\"\"\"\",\"\"\"\"password\"\"\"\":\"\"\"\"admin\"\"\"\"}')"
+      "Bash(curl -s -X POST http://127.0.0.1:8007/api/v1/auth/login -H \"Content-Type: application/json\" -d '{\"\"\"\"username\"\"\"\":\"\"\"\"admin\"\"\"\",\"\"\"\"password\"\"\"\":\"\"\"\"admin\"\"\"\"}')",
+      "Bash(git pull:*)"
     ]
   }
 }
