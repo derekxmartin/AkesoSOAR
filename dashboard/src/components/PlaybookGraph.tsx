@@ -1,14 +1,18 @@
 import {
+  addEdge,
   Background,
+  type Connection,
   Controls,
   type Edge,
   MiniMap,
   type Node,
   ReactFlow,
   ReactFlowProvider,
+  useEdgesState,
+  useNodesState,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import StepNode, { type StepNodeData } from "./nodes/StepNode";
 
 const nodeTypes = { step: StepNode };
@@ -32,6 +36,7 @@ interface Props {
   steps: PlaybookStep[];
   stepStatuses?: Record<string, string>; // step_id → status (for execution view)
   onNodeClick?: (stepId: string, step: PlaybookStep) => void;
+  onEdgeConnect?: (sourceId: string, targetId: string, sourceHandle?: string) => void;
   interactive?: boolean;
 }
 
@@ -173,10 +178,31 @@ function buildGraph(
   return { nodes, edges };
 }
 
-export default function PlaybookGraph({ steps, stepStatuses, onNodeClick, interactive = false }: Props) {
-  const { nodes: initialNodes, edges: initialEdges } = useMemo(
+export default function PlaybookGraph({ steps, stepStatuses, onNodeClick, onEdgeConnect, interactive = false }: Props) {
+  const { nodes: builtNodes, edges: builtEdges } = useMemo(
     () => buildGraph(steps, stepStatuses),
     [steps, stepStatuses]
+  );
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(builtNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(builtEdges);
+
+  // Sync when steps change externally
+  useEffect(() => {
+    setNodes(builtNodes);
+    setEdges(builtEdges);
+  }, [builtNodes, builtEdges, setNodes, setEdges]);
+
+  const handleConnect = useCallback(
+    (connection: Connection) => {
+      setEdges((eds) =>
+        addEdge({ ...connection, style: { stroke: "#64748b" } }, eds)
+      );
+      if (onEdgeConnect && connection.source && connection.target) {
+        onEdgeConnect(connection.source, connection.target, connection.sourceHandle ?? undefined);
+      }
+    },
+    [setEdges, onEdgeConnect]
   );
 
   const handleNodeClick = useCallback(
@@ -191,8 +217,11 @@ export default function PlaybookGraph({ steps, stepStatuses, onNodeClick, intera
     <ReactFlowProvider>
       <div className="h-[500px] bg-slate-900 rounded-lg border border-slate-700">
         <ReactFlow
-          nodes={initialNodes}
-          edges={initialEdges}
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={interactive ? handleConnect : undefined}
           nodeTypes={nodeTypes}
           onNodeClick={handleNodeClick}
           fitView

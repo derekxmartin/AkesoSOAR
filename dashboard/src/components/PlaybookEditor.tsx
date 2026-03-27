@@ -81,6 +81,27 @@ export default function PlaybookEditor({ initialSteps, onChange }: Props) {
     setSelectedStepId(null);
   };
 
+  const handleEdgeConnect = useCallback(
+    (sourceId: string, targetId: string, sourceHandle?: string) => {
+      const newSteps = steps.map((s) => {
+        if (s.id !== sourceId) return s;
+        const clone = { ...s };
+        if (s.type === "condition" && sourceHandle) {
+          // Connect condition branch (true/false handle)
+          clone.condition = {
+            ...clone.condition,
+            branches: { ...clone.condition?.branches, [sourceHandle]: targetId },
+          };
+        } else {
+          clone.on_success = targetId;
+        }
+        return clone;
+      });
+      updateSteps(newSteps);
+    },
+    [steps, updateSteps]
+  );
+
   const exportYaml = () => {
     const doc = { name: "Playbook", steps };
     const yamlStr = yaml.dump(doc, { lineWidth: 120, noRefs: true });
@@ -154,6 +175,7 @@ export default function PlaybookEditor({ initialSteps, onChange }: Props) {
           <PlaybookGraph
             steps={steps}
             onNodeClick={(id) => setSelectedStepId(id)}
+            onEdgeConnect={handleEdgeConnect}
             interactive
           />
         </div>
