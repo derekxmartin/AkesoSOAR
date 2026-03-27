@@ -6,7 +6,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
+from akeso_soar.api.audit import router as audit_router
 from akeso_soar.api.auth import router as auth_router
+from akeso_soar.api.use_cases import router as use_cases_router
 from akeso_soar.api.users import router as users_router
 from akeso_soar.config import settings
 from akeso_soar.db import engine
@@ -42,6 +44,8 @@ def create_app() -> FastAPI:
 
     app.include_router(auth_router)
     app.include_router(users_router)
+    app.include_router(use_cases_router)
+    app.include_router(audit_router)
 
     @app.get("/api/v1/health")
     async def health_check():

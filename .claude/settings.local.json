@@ -18,7 +18,9 @@
       "Bash(gh auth:*)",
       "Bash(git commit:*)",
       "Bash(gh repo:*)",
-      "Bash(alembic upgrade:*)"
+      "Bash(alembic upgrade:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }
