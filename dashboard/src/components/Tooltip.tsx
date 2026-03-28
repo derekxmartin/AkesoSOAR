@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, type ReactNode } from "react";
+import { useState, useRef, useCallback, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { HelpCircle } from "lucide-react";
 
 interface TooltipProps {
@@ -8,46 +9,58 @@ interface TooltipProps {
 
 export default function Tooltip({ text, children }: TooltipProps) {
   const [visible, setVisible] = useState(false);
-  const [position, setPosition] = useState<"above" | "below">("above");
+  const [coords, setCoords] = useState({ x: 0, y: 0, placement: "above" as "above" | "below" });
   const iconRef = useRef<HTMLSpanElement>(null);
-  const tipRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (visible && iconRef.current) {
-      const rect = iconRef.current.getBoundingClientRect();
-      // If not enough room above, show below
-      setPosition(rect.top < 60 ? "below" : "above");
+  const show = useCallback(() => {
+    if (!iconRef.current) return;
+    const rect = iconRef.current.getBoundingClientRect();
+    const tipWidth = 224; // w-56 = 14rem = 224px
+    const tipHeight = 80; // rough estimate
+
+    // Horizontal: center on icon, clamp to viewport
+    let x = rect.left + rect.width / 2 - tipWidth / 2;
+    x = Math.max(8, Math.min(x, window.innerWidth - tipWidth - 8));
+
+    // Vertical: prefer above, fall back to below
+    let placement: "above" | "below" = "above";
+    let y = rect.top - tipHeight - 6;
+    if (y < 8) {
+      placement = "below";
+      y = rect.bottom + 6;
     }
-  }, [visible]);
+
+    setCoords({ x, y, placement });
+    setVisible(true);
+  }, []);
 
   return (
     <span className="relative inline-flex items-center">
       {children}
       <span
         ref={iconRef}
-        onMouseEnter={() => setVisible(true)}
+        onMouseEnter={show}
         onMouseLeave={() => setVisible(false)}
         className="ml-1 text-slate-500 hover:text-blue-400 cursor-help inline-flex"
       >
         <HelpCircle size={12} />
       </span>
-      {visible && (
-        <div
-          ref={tipRef}
-          className={`absolute z-50 left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-slate-950 border border-slate-600 rounded shadow-lg text-[11px] text-slate-300 leading-relaxed w-56 pointer-events-none ${
-            position === "above" ? "bottom-full mb-1.5" : "top-full mt-1.5"
-          }`}
-        >
-          {text}
+      {visible &&
+        createPortal(
           <div
-            className={`absolute left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-950 border-slate-600 rotate-45 ${
-              position === "above"
-                ? "top-full -mt-1 border-r border-b"
-                : "bottom-full -mb-1 border-l border-t"
-            }`}
-          />
-        </div>
-      )}
+            style={{
+              position: "fixed",
+              left: coords.x,
+              top: coords.y,
+              zIndex: 9999,
+              width: 224,
+            }}
+            className="px-2.5 py-1.5 bg-slate-950 border border-slate-600 rounded shadow-xl text-[11px] text-slate-300 leading-relaxed pointer-events-none"
+          >
+            {text}
+          </div>,
+          document.body
+        )}
     </span>
   );
 }
