@@ -28,7 +28,17 @@
       "Bash(npm create:*)",
       "Bash(npm install:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(xargs grep:*)",
+      "Bash(grep -r \"connector.*operation\\\\|operation.*list\\\\|get_operations\" /c/Users/derek/Desktop/Projects/controls/AkesoSOAR --include=*.py --include=*.ts)",
+      "Bash(grep -r \"class.*Operation\\\\|def.*operations\\\\|OPERATIONS\\\\|actions.*list\\\\|REST\\\\|GRPC\" /c/Users/derek/Desktop/Projects/controls/AkesoSOAR/akeso_soar --include=*.py)",
+      "Bash(find /c/Users/derek/Desktop/Projects/controls/AkesoSOAR -path */routes/* -name *.py)",
+      "Bash(grep -r \"connector\\\\|operation\" /c/Users/derek/Desktop/Projects/controls/AkesoSOAR/akeso_soar/api --include=*.py)",
+      "Bash(grep -r \"CONNECTOR\\\\|connector.*OPERATION\\\\|supported.*operation\" /c/Users/derek/Desktop/Projects/controls/AkesoSOAR/akeso_soar --include=*.py)",
+      "Bash(grep -r \"siem\\\\|slack\\\\|github\\\\|servicenow\" /c/Users/derek/Desktop/Projects/controls/AkesoSOAR --include=*.py --include=*.ts)",
+      "Bash(grep -A 50 connector /c/Users/derek/Desktop/Projects/controls/AkesoSOAR/alembic/versions/*seed*)",
+      "Bash(find /c/Users/derek/Desktop/Projects/controls/AkesoSOAR -name schemas.py -o -name types.py -o -name *.pydantic)",
+      "Bash(grep -r \"class.*Connector\\\\|class.*Operation\" /c/Users/derek/Desktop/Projects/controls/AkesoSOAR/akeso_soar --include=*.py)"
     ]
   }
 }

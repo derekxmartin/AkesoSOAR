@@ -1,5 +1,74 @@
 @import "tailwindcss";
 
+/* ── Semantic design tokens registered with Tailwind v4 ── */
+@theme {
+  --color-app: var(--c-app);
+  --color-nav: var(--c-nav);
+  --color-card: var(--c-card);
+  --color-card-a: var(--c-card-a);
+  --color-inset: var(--c-inset);
+  --color-chip: var(--c-chip);
+  --color-chip-a: var(--c-chip-a);
+  --color-hover: var(--c-hover);
+  --color-hover-row: var(--c-hover-row);
+  --color-overlay: var(--c-overlay);
+  --color-fg: var(--c-fg);
+  --color-fg2: var(--c-fg2);
+  --color-fg3: var(--c-fg3);
+  --color-fg4: var(--c-fg4);
+  --color-edge: var(--c-edge);
+  --color-edge2: var(--c-edge2);
+  --color-edge-a: var(--c-edge-a);
+  --color-canvas: var(--c-canvas);
+  --color-grid: var(--c-grid);
+}
+
+/* ── Light mode (default) ── */
+:root {
+  --c-app: #ffffff;
+  --c-nav: #f8fafc;
+  --c-card: #f1f5f9;
+  --c-card-a: rgba(241, 245, 249, 0.5);
+  --c-inset: #ffffff;
+  --c-chip: #e2e8f0;
+  --c-chip-a: rgba(226, 232, 240, 0.5);
+  --c-hover: #e2e8f0;
+  --c-hover-row: rgba(241, 245, 249, 0.5);
+  --c-overlay: rgba(0, 0, 0, 0.3);
+  --c-fg: #0f172a;
+  --c-fg2: #475569;
+  --c-fg3: #64748b;
+  --c-fg4: #94a3b8;
+  --c-edge: #e2e8f0;
+  --c-edge2: #cbd5e1;
+  --c-edge-a: rgba(226, 232, 240, 0.5);
+  --c-canvas: #f1f5f9;
+  --c-grid: #cbd5e1;
+}
+
+/* ── Dark mode ── */
+.dark {
+  --c-app: #020617;
+  --c-nav: #0f172a;
+  --c-card: #1e293b;
+  --c-card-a: rgba(30, 41, 59, 0.5);
+  --c-inset: #334155;
+  --c-chip: #334155;
+  --c-chip-a: rgba(51, 65, 85, 0.5);
+  --c-hover: #334155;
+  --c-hover-row: rgba(51, 65, 85, 0.3);
+  --c-overlay: rgba(0, 0, 0, 0.5);
+  --c-fg: #ffffff;
+  --c-fg2: #cbd5e1;
+  --c-fg3: #94a3b8;
+  --c-fg4: #64748b;
+  --c-edge: #334155;
+  --c-edge2: #475569;
+  --c-edge-a: rgba(51, 65, 85, 0.5);
+  --c-canvas: #0f172a;
+  --c-grid: #334155;
+}
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;

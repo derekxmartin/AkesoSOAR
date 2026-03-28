@@ -1,0 +1,241 @@
+import {
+  addEdge,
+  Background,
+  type Connection,
+  Controls,
+  type Edge,
+  MiniMap,
+  type Node,
+  ReactFlow,
+  ReactFlowProvider,
+  useEdgesState,
+  useNodesState,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+import { useCallback, useEffect, useMemo } from "react";
+import { useTheme } from "../context/ThemeContext";
+import StepNode, { type StepNodeData } from "./nodes/StepNode";
+
+const nodeTypes = { step: StepNode };
+
+interface PlaybookStep {
+  id: string;
+  name: string;
+  type: string;
+  action?: { connector: string; operation: string; params?: Record<string, any> };
+  condition?: { expression: string; branches: Record<string, string> };
+  human_task?: { prompt: string; assignee_role: string };
+  transform?: { expression: string };
+  parallel?: { branches: { steps: string[] }[]; join: string };
+  on_success?: string;
+  on_failure?: string;
+  timeout_seconds?: number;
+  retry?: { max_attempts: number; backoff_seconds: number };
+}
+
+interface Props {
+  steps: PlaybookStep[];
+  stepStatuses?: Record<string, string>;
+  onNodeClick?: (stepId: string, step: PlaybookStep) => void;
+  onEdgeConnect?: (sourceId: string, targetId: string, sourceHandle?: string) => void;
+  interactive?: boolean;
+}
+
+function buildGraph(
+  steps: PlaybookStep[],
+  stepStatuses?: Record<string, string>
+): { nodes: Node[]; edges: Edge[] } {
+  const nodes: Node[] = [];
+  const edges: Edge[] = [];
+  const Y_SPACING = 120;
+  const X_SPACING = 250;
+
+  const positioned = new Set<string>();
+  let y = 0;
+
+  const stepMap = new Map(steps.map((s) => [s.id, s]));
+  const mainChain: string[] = [];
+  let current: string | undefined = steps[0]?.id;
+
+  while (current && !mainChain.includes(current)) {
+    mainChain.push(current);
+    const s = stepMap.get(current);
+    if (!s) break;
+    current = s.on_success || undefined;
+    if (s.type === "condition" && s.condition?.branches) {
+      current = s.condition.branches["true"] || s.condition.branches["false"];
+    }
+  }
+
+  for (const id of mainChain) {
+    const s = stepMap.get(id)!;
+    nodes.push({
+      id,
+      type: "step",
+      position: { x: 300, y },
+      data: {
+        label: s.name,
+        stepType: s.type as StepNodeData["stepType"],
+        connector: s.action?.connector,
+        operation: s.action?.operation,
+        status: stepStatuses?.[id],
+      },
+    });
+    positioned.add(id);
+    y += Y_SPACING;
+  }
+
+  let xOffset = 0;
+  for (const s of steps) {
+    if (positioned.has(s.id)) continue;
+    xOffset += X_SPACING;
+    nodes.push({
+      id: s.id,
+      type: "step",
+      position: { x: 300 + xOffset, y: Y_SPACING * 2 },
+      data: {
+        label: s.name,
+        stepType: s.type as StepNodeData["stepType"],
+        connector: s.action?.connector,
+        operation: s.action?.operation,
+        status: stepStatuses?.[s.id],
+      },
+    });
+    positioned.add(s.id);
+  }
+
+  for (const s of steps) {
+    if (s.on_success && stepMap.has(s.on_success) && s.type !== "condition") {
+      edges.push({
+        id: `${s.id}->${s.on_success}`,
+        source: s.id,
+        target: s.on_success,
+        animated: false,
+        style: { stroke: "#64748b" },
+      });
+    }
+
+    if (s.on_failure && s.on_failure !== "abort" && stepMap.has(s.on_failure)) {
+      edges.push({
+        id: `${s.id}->fail->${s.on_failure}`,
+        source: s.id,
+        target: s.on_failure,
+        animated: false,
+        label: "fail",
+        style: { stroke: "#ef4444" },
+        labelStyle: { fill: "#ef4444", fontSize: 10 },
+      });
+    }
+
+    if (s.type === "condition" && s.condition?.branches) {
+      const { branches } = s.condition;
+      if (branches["true"] && stepMap.has(branches["true"])) {
+        edges.push({
+          id: `${s.id}->true->${branches["true"]}`,
+          source: s.id,
+          sourceHandle: "true",
+          target: branches["true"],
+          label: "true",
+          style: { stroke: "#22c55e" },
+          labelStyle: { fill: "#22c55e", fontSize: 10 },
+        });
+      }
+      if (branches["false"] && stepMap.has(branches["false"])) {
+        edges.push({
+          id: `${s.id}->false->${branches["false"]}`,
+          source: s.id,
+          sourceHandle: "false",
+          target: branches["false"],
+          label: "false",
+          style: { stroke: "#ef4444" },
+          labelStyle: { fill: "#ef4444", fontSize: 10 },
+        });
+      }
+    }
+
+    if (s.type === "parallel" && s.parallel?.branches) {
+      for (const branch of s.parallel.branches) {
+        if (branch.steps.length > 0 && stepMap.has(branch.steps[0])) {
+          edges.push({
+            id: `${s.id}->par->${branch.steps[0]}`,
+            source: s.id,
+            target: branch.steps[0],
+            animated: true,
+            style: { stroke: "#a855f7" },
+          });
+        }
+      }
+    }
+  }
+
+  return { nodes, edges };
+}
+
+export default function PlaybookGraph({ steps, stepStatuses, onNodeClick, onEdgeConnect, interactive = false }: Props) {
+  const { theme } = useTheme();
+  const { nodes: builtNodes, edges: builtEdges } = useMemo(
+    () => buildGraph(steps, stepStatuses),
+    [steps, stepStatuses]
+  );
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(builtNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(builtEdges);
+
+  useEffect(() => {
+    setNodes(builtNodes);
+    setEdges(builtEdges);
+  }, [builtNodes, builtEdges, setNodes, setEdges]);
+
+  const handleConnect = useCallback(
+    (connection: Connection) => {
+      setEdges((eds) =>
+        addEdge({ ...connection, style: { stroke: "#64748b" } }, eds)
+      );
+      if (onEdgeConnect && connection.source && connection.target) {
+        onEdgeConnect(connection.source, connection.target, connection.sourceHandle ?? undefined);
+      }
+    },
+    [setEdges, onEdgeConnect]
+  );
+
+  const handleNodeClick = useCallback(
+    (_: any, node: Node) => {
+      const step = steps.find((s) => s.id === node.id);
+      if (step && onNodeClick) onNodeClick(node.id, step);
+    },
+    [steps, onNodeClick]
+  );
+
+  const gridColor = theme === "dark" ? "#334155" : "#cbd5e1";
+  const canvasBg = theme === "dark" ? "bg-slate-900" : "bg-slate-100";
+
+  return (
+    <ReactFlowProvider>
+      <div className={`h-[500px] ${canvasBg} rounded-lg border border-edge`}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={interactive ? handleConnect : undefined}
+          nodeTypes={nodeTypes}
+          onNodeClick={handleNodeClick}
+          fitView
+          nodesDraggable={interactive}
+          nodesConnectable={interactive}
+          proOptions={{ hideAttribution: true }}
+        >
+          <Background color={gridColor} gap={20} />
+          <Controls className="!bg-card !border-edge2 [&>button]:!bg-inset [&>button]:!border-edge2 [&>button]:!text-fg" />
+          {!interactive && (
+            <MiniMap
+              className="!bg-card !border-edge2"
+              nodeColor={() => "#3b82f6"}
+              maskColor="rgba(0,0,0,0.5)"
+            />
+          )}
+        </ReactFlow>
+      </div>
+    </ReactFlowProvider>
+  );
+}

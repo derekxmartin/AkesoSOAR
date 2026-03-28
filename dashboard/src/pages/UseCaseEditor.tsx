@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import MitrePicker from "../components/MitrePicker";
 import Badge from "../components/ui/Badge";
 import { useApiGet } from "../hooks/useApiQuery";
+import usePageTitle from "../hooks/usePageTitle";
 import api from "../lib/api";
 
 const SEVERITIES = ["critical", "high", "medium", "low", "informational"];
@@ -13,6 +14,8 @@ export default function UseCaseEditor() {
   const { id } = useParams<{ id: string }>();
   const isNew = !id || id === "new";
   const navigate = useNavigate();
+
+  usePageTitle(isNew ? "New Use Case" : `Edit Use Case`);
 
   const { data: existing } = useApiGet<any>(
     ["use-case", id!],
@@ -44,7 +47,6 @@ export default function UseCaseEditor() {
   const [transitionReason, setTransitionReason] = useState("");
   const [transitionError, setTransitionError] = useState("");
 
-  // Load existing data
   useEffect(() => {
     if (!isNew && existing) {
       setForm({
@@ -124,19 +126,19 @@ export default function UseCaseEditor() {
 
   const field = (label: string, key: string, type: "text" | "textarea" | "number" | "select" = "text", options?: string[]) => (
     <div>
-      <label className="block text-sm font-medium text-slate-300 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-fg2 mb-1">{label}</label>
       {type === "textarea" ? (
         <textarea
           value={(form as any)[key]}
           onChange={(e) => setForm({ ...form, [key]: e.target.value })}
           rows={4}
-          className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full px-3 py-2 bg-inset border border-edge2 rounded text-sm text-fg placeholder-fg3 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       ) : type === "select" ? (
         <select
           value={(form as any)[key]}
           onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-          className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-sm text-white"
+          className="w-full px-3 py-2 bg-inset border border-edge2 rounded text-sm text-fg"
         >
           {key === "severity_threshold" && <option value="">None</option>}
           {options?.map((o) => <option key={o} value={o}>{o.charAt(0).toUpperCase() + o.slice(1)}</option>)}
@@ -146,7 +148,7 @@ export default function UseCaseEditor() {
           type={type}
           value={(form as any)[key]}
           onChange={(e) => setForm({ ...form, [key]: type === "number" ? parseInt(e.target.value) || 0 : e.target.value })}
-          className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full px-3 py-2 bg-inset border border-edge2 rounded text-sm text-fg placeholder-fg3 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       )}
     </div>
@@ -155,7 +157,7 @@ export default function UseCaseEditor() {
   return (
     <div>
       <div className="flex items-center gap-4 mb-6">
-        <button onClick={() => navigate(isNew ? "/use-cases" : `/use-cases/${id}`)} className="text-slate-400 hover:text-white">
+        <button onClick={() => navigate(isNew ? "/use-cases" : `/use-cases/${id}`)} className="text-fg3 hover:text-fg">
           <ArrowLeft size={20} />
         </button>
         <h1 className="text-2xl font-bold">{isNew ? "New Use Case" : `Edit: ${existing?.name || ""}`}</h1>
@@ -163,8 +165,8 @@ export default function UseCaseEditor() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-white">General</h2>
+        <div className="bg-card-a rounded-lg border border-edge p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-fg">General</h2>
           {field("Name", "name")}
           {field("Description", "description", "textarea")}
           <div className="grid grid-cols-2 gap-4">
@@ -173,8 +175,8 @@ export default function UseCaseEditor() {
           </div>
         </div>
 
-        <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-white">MITRE ATT&CK Mapping</h2>
+        <div className="bg-card-a rounded-lg border border-edge p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-fg">MITRE ATT&CK Mapping</h2>
           <MitrePicker
             selectedTactics={form.mitre_tactics}
             selectedTechniques={form.mitre_techniques}
@@ -183,21 +185,21 @@ export default function UseCaseEditor() {
           />
         </div>
 
-        <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Detection</h2>
+        <div className="bg-card-a rounded-lg border border-edge p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-fg">Detection</h2>
           {field("Sigma Rule IDs (comma-separated)", "sigma_rule_ids")}
           {field("SIEM Alert Query", "siem_alert_query")}
           {field("Severity Threshold", "severity_threshold", "select", SEVERITIES)}
         </div>
 
-        <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Response</h2>
+        <div className="bg-card-a rounded-lg border border-edge p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-fg">Response</h2>
           {field("Escalation Policy", "escalation_policy", "select", ESCALATION_POLICIES)}
           {field("Notification Channels (comma-separated)", "notification_channels")}
         </div>
 
-        <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Documentation</h2>
+        <div className="bg-card-a rounded-lg border border-edge p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-fg">Documentation</h2>
           {field("Summary", "summary", "textarea")}
           {field("Investigation Guide (Markdown)", "investigation_guide", "textarea")}
           {field("False Positive Guidance", "false_positive_guidance", "textarea")}
@@ -205,8 +207,8 @@ export default function UseCaseEditor() {
         </div>
 
         {!isNew && (
-          <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-white">Change Description</h2>
+          <div className="bg-card-a rounded-lg border border-edge p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-fg">Change Description</h2>
             {field("What changed?", "change_description")}
           </div>
         )}
@@ -216,24 +218,23 @@ export default function UseCaseEditor() {
         <button
           type="submit"
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 rounded-md font-medium transition-colors"
+          className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 rounded-md font-medium text-white transition-colors"
         >
           <Save size={16} /> {saving ? "Saving..." : isNew ? "Create Use Case" : "Save Changes"}
         </button>
       </form>
 
-      {/* State transitions (only for existing use cases) */}
       {!isNew && existing && (
-        <div className="mt-8 bg-slate-800/50 rounded-lg border border-slate-700 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Lifecycle Transition</h2>
-          <p className="text-sm text-slate-400">Current status: <Badge value={existing.status} /></p>
+        <div className="mt-8 bg-card-a rounded-lg border border-edge p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-fg">Lifecycle Transition</h2>
+          <p className="text-sm text-fg3">Current status: <Badge value={existing.status} /></p>
           <div className="flex gap-3 items-end">
             <div className="flex-1">
-              <label className="block text-sm text-slate-300 mb-1">Transition To</label>
+              <label className="block text-sm text-fg2 mb-1">Transition To</label>
               <select
                 value={transitionTarget}
                 onChange={(e) => setTransitionTarget(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-sm text-white"
+                className="w-full px-3 py-2 bg-inset border border-edge2 rounded text-sm text-fg"
               >
                 <option value="">Select...</option>
                 {existing.status === "draft" && <><option value="testing">Testing</option><option value="deprecated">Deprecated</option></>}
@@ -242,12 +243,12 @@ export default function UseCaseEditor() {
               </select>
             </div>
             <div className="flex-1">
-              <label className="block text-sm text-slate-300 mb-1">Reason</label>
+              <label className="block text-sm text-fg2 mb-1">Reason</label>
               <input
                 type="text"
                 value={transitionReason}
                 onChange={(e) => setTransitionReason(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-sm text-white"
+                className="w-full px-3 py-2 bg-inset border border-edge2 rounded text-sm text-fg"
                 placeholder="Reason for transition..."
               />
             </div>
@@ -255,7 +256,7 @@ export default function UseCaseEditor() {
               type="button"
               onClick={handleTransition}
               disabled={!transitionTarget || !transitionReason}
-              className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-slate-700 rounded text-sm font-medium transition-colors"
+              className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-chip rounded text-sm font-medium text-white transition-colors"
             >
               Transition
             </button>

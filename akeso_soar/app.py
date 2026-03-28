@@ -9,6 +9,7 @@ from sqlalchemy import text
 from akeso_soar.api.alerts import router as alerts_router
 from akeso_soar.api.audit import router as audit_router
 from akeso_soar.api.auth import router as auth_router
+from akeso_soar.api.connectors import router as connectors_router
 from akeso_soar.api.coverage import router as coverage_router
 from akeso_soar.api.executions import router as executions_router
 from akeso_soar.api.playbooks import router as playbooks_router
@@ -56,6 +57,7 @@ def create_app() -> FastAPI:
     app.include_router(playbooks_router)
     app.include_router(executions_router)
     app.include_router(audit_router)
+    app.include_router(connectors_router)
     app.include_router(coverage_router)
 
     @app.get("/api/v1/health")
