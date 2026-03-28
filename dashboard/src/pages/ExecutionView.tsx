@@ -56,7 +56,7 @@ export default function ExecutionView() {
     return map;
   }, [execution]);
 
-  if (isLoading || !execution) return <div className="text-slate-400">Loading...</div>;
+  if (isLoading || !execution) return <div className="text-fg3">Loading...</div>;
 
   const steps = playbook?.definition?.steps || [];
 
@@ -64,36 +64,36 @@ export default function ExecutionView() {
     <div>
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
-        <button onClick={() => navigate("/executions")} className="text-slate-400 hover:text-white">
+        <button onClick={() => navigate("/executions")} className="text-fg3 hover:text-fg">
           <ArrowLeft size={20} />
         </button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold">Execution</h1>
-          <p className="text-slate-400 text-xs font-mono">{execution.id}</p>
+          <p className="text-fg3 text-xs font-mono">{execution.id}</p>
         </div>
         <Badge value={execution.status} />
         {execution.duration_ms != null && (
-          <span className="text-sm text-slate-400">{execution.duration_ms}ms</span>
+          <span className="text-sm text-fg3">{execution.duration_ms}ms</span>
         )}
       </div>
 
       {/* Info bar */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-slate-800/50 rounded border border-slate-700 p-3">
-          <div className="text-xs text-slate-400">Playbook</div>
-          <div className="text-sm text-white font-medium">{playbook?.name || execution.playbook_id.slice(0, 8)}</div>
+        <div className="bg-card-a rounded border border-edge p-3">
+          <div className="text-xs text-fg3">Playbook</div>
+          <div className="text-sm text-fg font-medium">{playbook?.name || execution.playbook_id.slice(0, 8)}</div>
         </div>
-        <div className="bg-slate-800/50 rounded border border-slate-700 p-3">
-          <div className="text-xs text-slate-400">Version</div>
-          <div className="text-sm text-white">v{execution.playbook_version}</div>
+        <div className="bg-card-a rounded border border-edge p-3">
+          <div className="text-xs text-fg3">Version</div>
+          <div className="text-sm text-fg">v{execution.playbook_version}</div>
         </div>
-        <div className="bg-slate-800/50 rounded border border-slate-700 p-3">
-          <div className="text-xs text-slate-400">Alert</div>
-          <div className="text-sm text-white">{execution.trigger_alert_id || "manual"}</div>
+        <div className="bg-card-a rounded border border-edge p-3">
+          <div className="text-xs text-fg3">Alert</div>
+          <div className="text-sm text-fg">{execution.trigger_alert_id || "manual"}</div>
         </div>
-        <div className="bg-slate-800/50 rounded border border-slate-700 p-3">
-          <div className="text-xs text-slate-400">Started</div>
-          <div className="text-sm text-white">{execution.started_at ? new Date(execution.started_at).toLocaleString() : "—"}</div>
+        <div className="bg-card-a rounded border border-edge p-3">
+          <div className="text-xs text-fg3">Started</div>
+          <div className="text-sm text-fg">{execution.started_at ? new Date(execution.started_at).toLocaleString() : "—"}</div>
         </div>
       </div>
 
@@ -119,15 +119,15 @@ export default function ExecutionView() {
               onClick={() => setSelectedStepResult(sr)}
               className={`flex items-center justify-between p-3 rounded border cursor-pointer transition-colors ${
                 selectedStepResult?.id === sr.id
-                  ? "bg-slate-700 border-blue-500"
-                  : "bg-slate-800/50 border-slate-700 hover:bg-slate-700/30"
+                  ? "bg-hover border-blue-500"
+                  : "bg-card-a border-edge hover:bg-hover-row"
               }`}
             >
               <div className="flex items-center gap-3">
                 <Badge value={sr.status} />
-                <span className="text-sm font-medium text-white">{sr.step_id}</span>
+                <span className="text-sm font-medium text-fg">{sr.step_id}</span>
               </div>
-              <div className="flex items-center gap-4 text-xs text-slate-400">
+              <div className="flex items-center gap-4 text-xs text-fg3">
                 {sr.retry_count > 0 && <span>retries: {sr.retry_count}</span>}
                 {sr.duration_ms != null && <span>{sr.duration_ms}ms</span>}
                 {sr.error && <span className="text-red-400 max-w-48 truncate">{sr.error}</span>}
@@ -139,23 +139,23 @@ export default function ExecutionView() {
 
       {/* Selected step detail */}
       {selectedStepResult && (
-        <div className="mt-4 bg-slate-800/50 rounded-lg border border-slate-700 p-4">
-          <h3 className="text-sm font-semibold text-white mb-3">
+        <div className="mt-4 bg-card-a rounded-lg border border-edge p-4">
+          <h3 className="text-sm font-semibold text-fg mb-3">
             Step: {selectedStepResult.step_id} — <Badge value={selectedStepResult.status} />
           </h3>
           <div className="grid grid-cols-2 gap-4">
             {selectedStepResult.input_data && (
               <div>
-                <div className="text-xs text-slate-400 mb-1">Input</div>
-                <pre className="text-xs text-slate-300 bg-slate-900 rounded p-2 overflow-auto max-h-40">
+                <div className="text-xs text-fg3 mb-1">Input</div>
+                <pre className="text-xs text-fg2 bg-nav rounded p-2 overflow-auto max-h-40">
                   {JSON.stringify(selectedStepResult.input_data, null, 2)}
                 </pre>
               </div>
             )}
             {selectedStepResult.output_data && (
               <div>
-                <div className="text-xs text-slate-400 mb-1">Output</div>
-                <pre className="text-xs text-slate-300 bg-slate-900 rounded p-2 overflow-auto max-h-40">
+                <div className="text-xs text-fg3 mb-1">Output</div>
+                <pre className="text-xs text-fg2 bg-nav rounded p-2 overflow-auto max-h-40">
                   {JSON.stringify(selectedStepResult.output_data, null, 2)}
                 </pre>
               </div>

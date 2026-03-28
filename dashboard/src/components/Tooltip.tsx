@@ -41,7 +41,7 @@ export default function Tooltip({ text, children }: TooltipProps) {
         ref={iconRef}
         onMouseEnter={show}
         onMouseLeave={() => setVisible(false)}
-        className="ml-1 text-slate-500 hover:text-blue-400 cursor-help inline-flex"
+        className="ml-1 text-fg4 hover:text-blue-400 cursor-help inline-flex"
       >
         <HelpCircle size={12} />
       </span>
@@ -55,7 +55,7 @@ export default function Tooltip({ text, children }: TooltipProps) {
               zIndex: 9999,
               width: 224,
             }}
-            className="px-2.5 py-1.5 bg-slate-950 border border-slate-600 rounded shadow-xl text-[11px] text-slate-300 leading-relaxed pointer-events-none"
+            className="px-2.5 py-1.5 bg-app border border-edge2 rounded shadow-xl text-[11px] text-fg2 leading-relaxed pointer-events-none"
           >
             {text}
           </div>,
@@ -68,7 +68,7 @@ export default function Tooltip({ text, children }: TooltipProps) {
 /** Convenience: label text + tooltip icon inline */
 export function FieldLabel({ label, tooltip }: { label: string; tooltip: string }) {
   return (
-    <label className="flex items-center text-xs text-slate-400 mb-1">
+    <label className="flex items-center text-xs text-fg3 mb-1">
       <Tooltip text={tooltip}>
         <span>{label}</span>
       </Tooltip>

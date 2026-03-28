@@ -13,6 +13,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo } from "react";
+import { useTheme } from "../context/ThemeContext";
 import StepNode, { type StepNodeData } from "./nodes/StepNode";
 
 const nodeTypes = { step: StepNode };
@@ -34,7 +35,7 @@ interface PlaybookStep {
 
 interface Props {
   steps: PlaybookStep[];
-  stepStatuses?: Record<string, string>; // step_id → status (for execution view)
+  stepStatuses?: Record<string, string>;
   onNodeClick?: (stepId: string, step: PlaybookStep) => void;
   onEdgeConnect?: (sourceId: string, targetId: string, sourceHandle?: string) => void;
   interactive?: boolean;
@@ -49,12 +50,9 @@ function buildGraph(
   const Y_SPACING = 120;
   const X_SPACING = 250;
 
-  // Position nodes in a simple top-down layout
-  // Group: first lay out the main chain, then position parallel/branch targets
   const positioned = new Set<string>();
   let y = 0;
 
-  // Follow the main chain from the first step
   const stepMap = new Map(steps.map((s) => [s.id, s]));
   const mainChain: string[] = [];
   let current: string | undefined = steps[0]?.id;
@@ -64,13 +62,11 @@ function buildGraph(
     const s = stepMap.get(current);
     if (!s) break;
     current = s.on_success || undefined;
-    // For conditions, follow the "true" branch as main chain
     if (s.type === "condition" && s.condition?.branches) {
       current = s.condition.branches["true"] || s.condition.branches["false"];
     }
   }
 
-  // Position main chain
   for (const id of mainChain) {
     const s = stepMap.get(id)!;
     nodes.push({
@@ -89,7 +85,6 @@ function buildGraph(
     y += Y_SPACING;
   }
 
-  // Position remaining steps (branch targets, parallel sub-steps)
   let xOffset = 0;
   for (const s of steps) {
     if (positioned.has(s.id)) continue;
@@ -109,7 +104,6 @@ function buildGraph(
     positioned.add(s.id);
   }
 
-  // Build edges
   for (const s of steps) {
     if (s.on_success && stepMap.has(s.on_success) && s.type !== "condition") {
       edges.push({
@@ -159,7 +153,6 @@ function buildGraph(
       }
     }
 
-    // Parallel branch edges
     if (s.type === "parallel" && s.parallel?.branches) {
       for (const branch of s.parallel.branches) {
         if (branch.steps.length > 0 && stepMap.has(branch.steps[0])) {
@@ -179,6 +172,7 @@ function buildGraph(
 }
 
 export default function PlaybookGraph({ steps, stepStatuses, onNodeClick, onEdgeConnect, interactive = false }: Props) {
+  const { theme } = useTheme();
   const { nodes: builtNodes, edges: builtEdges } = useMemo(
     () => buildGraph(steps, stepStatuses),
     [steps, stepStatuses]
@@ -187,7 +181,6 @@ export default function PlaybookGraph({ steps, stepStatuses, onNodeClick, onEdge
   const [nodes, setNodes, onNodesChange] = useNodesState(builtNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(builtEdges);
 
-  // Sync when steps change externally
   useEffect(() => {
     setNodes(builtNodes);
     setEdges(builtEdges);
@@ -213,9 +206,12 @@ export default function PlaybookGraph({ steps, stepStatuses, onNodeClick, onEdge
     [steps, onNodeClick]
   );
 
+  const gridColor = theme === "dark" ? "#334155" : "#cbd5e1";
+  const canvasBg = theme === "dark" ? "bg-slate-900" : "bg-slate-100";
+
   return (
     <ReactFlowProvider>
-      <div className="h-[500px] bg-slate-900 rounded-lg border border-slate-700">
+      <div className={`h-[500px] ${canvasBg} rounded-lg border border-edge`}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -229,11 +225,11 @@ export default function PlaybookGraph({ steps, stepStatuses, onNodeClick, onEdge
           nodesConnectable={interactive}
           proOptions={{ hideAttribution: true }}
         >
-          <Background color="#334155" gap={20} />
-          <Controls className="!bg-slate-800 !border-slate-600 [&>button]:!bg-slate-700 [&>button]:!border-slate-600 [&>button]:!text-white" />
+          <Background color={gridColor} gap={20} />
+          <Controls className="!bg-card !border-edge2 [&>button]:!bg-inset [&>button]:!border-edge2 [&>button]:!text-fg" />
           {!interactive && (
             <MiniMap
-              className="!bg-slate-800 !border-slate-600"
+              className="!bg-card !border-edge2"
               nodeColor={() => "#3b82f6"}
               maskColor="rgba(0,0,0,0.5)"
             />

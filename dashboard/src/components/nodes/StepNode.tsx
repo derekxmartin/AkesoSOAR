@@ -55,12 +55,12 @@ export default function StepNode({ data, selected }: NodeProps) {
     >
       <Handle type="target" position={Position.Top} className="!bg-slate-400 !w-2 !h-2" />
 
-      <div className="text-xs text-slate-400 mb-1">
+      <div className="text-xs text-fg3 mb-1">
         {TYPE_ICONS[d.stepType]} {d.stepType}
       </div>
-      <div className="text-sm font-medium text-white">{d.label}</div>
+      <div className="text-sm font-medium text-fg">{d.label}</div>
       {d.connector && (
-        <div className="text-xs text-slate-400 mt-1">
+        <div className="text-xs text-fg3 mt-1">
           {d.connector}.{d.operation}
         </div>
       )}

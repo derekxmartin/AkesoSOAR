@@ -64,7 +64,6 @@ export default function PlaybookEditor({ initialSteps, onChange }: Props) {
     if (idx === -1) return;
     const newSteps = [...steps];
     newSteps[idx] = updated;
-    // If ID changed, update references
     if (updated.id !== selectedStepId) {
       for (const s of newSteps) {
         if (s.on_success === selectedStepId) s.on_success = updated.id;
@@ -87,7 +86,6 @@ export default function PlaybookEditor({ initialSteps, onChange }: Props) {
         if (s.id !== sourceId) return s;
         const clone = { ...s };
         if (s.type === "condition" && sourceHandle) {
-          // Connect condition branch (true/false handle)
           clone.condition = {
             ...clone.condition,
             branches: { ...clone.condition?.branches, [sourceHandle]: targetId },
@@ -133,12 +131,12 @@ export default function PlaybookEditor({ initialSteps, onChange }: Props) {
     <div className="flex flex-col gap-4">
       {/* Toolbar */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm text-slate-400 mr-2">Add step:</span>
+        <span className="text-sm text-fg3 mr-2">Add step:</span>
         {Object.keys(STEP_TEMPLATES).map((type) => (
           <button
             key={type}
             onClick={() => addStep(type)}
-            className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded text-xs font-medium transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 bg-inset hover:bg-hover border border-edge2 rounded text-xs font-medium transition-colors"
           >
             <Plus size={12} /> {type}
           </button>
@@ -146,24 +144,24 @@ export default function PlaybookEditor({ initialSteps, onChange }: Props) {
 
         <div className="flex-1" />
 
-        <button onClick={exportYaml} className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded text-xs">
+        <button onClick={exportYaml} className="flex items-center gap-1 px-3 py-1.5 bg-inset hover:bg-hover border border-edge2 rounded text-xs">
           <Download size={12} /> Export YAML
         </button>
-        <button onClick={() => setShowImport(!showImport)} className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded text-xs">
+        <button onClick={() => setShowImport(!showImport)} className="flex items-center gap-1 px-3 py-1.5 bg-inset hover:bg-hover border border-edge2 rounded text-xs">
           <Upload size={12} /> Import YAML
         </button>
       </div>
 
       {showImport && (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-2">
+        <div className="bg-card border border-edge rounded-lg p-4 space-y-2">
           <textarea
             value={yamlInput}
             onChange={(e) => setYamlInput(e.target.value)}
             rows={8}
             placeholder="Paste playbook YAML here..."
-            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-xs text-white font-mono placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-inset border border-edge2 rounded text-xs text-fg font-mono placeholder-fg3 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <button onClick={importYaml} className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 rounded text-xs font-medium">
+          <button onClick={importYaml} className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 rounded text-xs font-medium text-white">
             Import
           </button>
         </div>
@@ -190,7 +188,7 @@ export default function PlaybookEditor({ initialSteps, onChange }: Props) {
         )}
       </div>
 
-      <div className="text-xs text-slate-500">
+      <div className="text-xs text-fg4">
         {steps.length} step(s) | Click a node to configure | Drag nodes to reposition
       </div>
     </div>

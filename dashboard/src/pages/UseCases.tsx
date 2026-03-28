@@ -54,7 +54,7 @@ export default function UseCases() {
         <h1 className="text-2xl font-bold">Use Cases</h1>
         <button
           onClick={() => navigate("/use-cases/new")}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium text-white transition-colors"
         >
           <Plus size={16} /> New Use Case
         </button>
@@ -67,12 +67,12 @@ export default function UseCases() {
           placeholder="Search..."
           value={search}
           onChange={(e) => updateFilter("search", e.target.value)}
-          className="px-3 py-1.5 bg-slate-800 border border-slate-600 rounded text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="px-3 py-1.5 bg-inset border border-edge2 rounded text-sm text-fg placeholder-fg3 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
         <select
           value={status}
           onChange={(e) => updateFilter("status", e.target.value)}
-          className="px-3 py-1.5 bg-slate-800 border border-slate-600 rounded text-sm text-white"
+          className="px-3 py-1.5 bg-inset border border-edge2 rounded text-sm text-fg"
         >
           <option value="">All Statuses</option>
           {STATUSES.filter(Boolean).map((s) => (
@@ -82,7 +82,7 @@ export default function UseCases() {
         <select
           value={severity}
           onChange={(e) => updateFilter("severity", e.target.value)}
-          className="px-3 py-1.5 bg-slate-800 border border-slate-600 rounded text-sm text-white"
+          className="px-3 py-1.5 bg-inset border border-edge2 rounded text-sm text-fg"
         >
           <option value="">All Severities</option>
           {SEVERITIES.filter(Boolean).map((s) => (
@@ -92,10 +92,10 @@ export default function UseCases() {
       </div>
 
       {/* Table */}
-      <div className="bg-slate-800/50 rounded-lg border border-slate-700 overflow-hidden">
+      <div className="bg-card-a rounded-lg border border-edge overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-700 text-left text-slate-400">
+            <tr className="border-b border-edge text-left text-fg3">
               <th className="px-4 py-3 font-medium">Name</th>
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium">Severity</th>
@@ -106,25 +106,25 @@ export default function UseCases() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-slate-400">Loading...</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-fg3">Loading...</td></tr>
             ) : !data?.items.length ? (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-slate-400">No use cases found</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-fg3">No use cases found</td></tr>
             ) : (
               data.items.map((uc) => (
                 <tr
                   key={uc.id}
                   onClick={() => navigate(`/use-cases/${uc.id}`)}
-                  className="border-b border-slate-700/50 hover:bg-slate-700/30 cursor-pointer transition-colors"
+                  className="border-b border-edge-a hover:bg-hover-row cursor-pointer transition-colors"
                 >
-                  <td className="px-4 py-3 font-medium text-white">{uc.name}</td>
+                  <td className="px-4 py-3 font-medium text-fg">{uc.name}</td>
                   <td className="px-4 py-3"><Badge value={uc.status} /></td>
                   <td className="px-4 py-3"><Badge value={uc.severity} /></td>
-                  <td className="px-4 py-3 text-slate-300">
+                  <td className="px-4 py-3 text-fg2">
                     {uc.mitre_techniques?.slice(0, 3).join(", ")}
                     {(uc.mitre_techniques?.length || 0) > 3 && "..."}
                   </td>
-                  <td className="px-4 py-3 text-slate-300">v{uc.version}</td>
-                  <td className="px-4 py-3 text-slate-400">{new Date(uc.updated_at).toLocaleDateString()}</td>
+                  <td className="px-4 py-3 text-fg2">v{uc.version}</td>
+                  <td className="px-4 py-3 text-fg3">{new Date(uc.updated_at).toLocaleDateString()}</td>
                 </tr>
               ))
             )}
@@ -138,17 +138,17 @@ export default function UseCases() {
           <button
             onClick={() => updateFilter("page", String(page - 1))}
             disabled={page <= 1}
-            className="px-3 py-1 bg-slate-800 border border-slate-600 rounded text-sm disabled:opacity-50"
+            className="px-3 py-1 bg-card border border-edge2 rounded text-sm disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="px-3 py-1 text-sm text-slate-400">
+          <span className="px-3 py-1 text-sm text-fg3">
             Page {page} of {Math.ceil(data.total / 20)}
           </span>
           <button
             onClick={() => updateFilter("page", String(page + 1))}
             disabled={page * 20 >= data.total}
-            className="px-3 py-1 bg-slate-800 border border-slate-600 rounded text-sm disabled:opacity-50"
+            className="px-3 py-1 bg-card border border-edge2 rounded text-sm disabled:opacity-50"
           >
             Next
           </button>

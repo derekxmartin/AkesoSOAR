@@ -34,7 +34,6 @@ interface Props {
   allStepIds: string[];
 }
 
-/* ── tooltip text for every field ── */
 const TIPS = {
   stepId: "Unique identifier for this step. Used in on_success/on_failure routing and Jinja2 references like {{ steps.<id>.result }}.",
   name: "Human-readable label displayed on the graph node. Does not affect execution.",
@@ -90,14 +89,14 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
           value={value || ""}
           onChange={(e) => update(path, e.target.value)}
           rows={2}
-          className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full px-2 py-1 bg-inset border border-edge2 rounded text-xs text-fg focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       ) : (
         <input
           type={type}
           value={value || ""}
           onChange={(e) => update(path, type === "number" ? parseInt(e.target.value) || 0 : e.target.value)}
-          className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full px-2 py-1 bg-inset border border-edge2 rounded text-xs text-fg focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       )}
     </div>
@@ -109,7 +108,7 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
       <select
         value={value || ""}
         onChange={(e) => update(path, e.target.value || undefined)}
-        className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs text-white"
+        className="w-full px-2 py-1 bg-inset border border-edge2 rounded text-xs text-fg"
       >
         <option value="">None</option>
         <option value="abort">Abort</option>
@@ -129,7 +128,7 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
           update("action.connector", e.target.value);
           update("action.operation", "");
         }}
-        className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs text-white"
+        className="w-full px-2 py-1 bg-inset border border-edge2 rounded text-xs text-fg"
       >
         <option value="">Select a connector...</option>
         {connectors.map((c) => (
@@ -138,7 +137,7 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
           </option>
         ))}
       </select>
-      {loadingConnectors && <p className="text-[10px] text-slate-500 mt-0.5">Loading connectors...</p>}
+      {loadingConnectors && <p className="text-[10px] text-fg4 mt-0.5">Loading connectors...</p>}
     </div>
   );
 
@@ -162,7 +161,7 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
           }
         }}
         disabled={!selectedConnector}
-        className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs text-white disabled:opacity-50"
+        className="w-full px-2 py-1 bg-inset border border-edge2 rounded text-xs text-fg disabled:opacity-50"
       >
         <option value="">{selectedConnector ? "Select an operation..." : "Select a connector first"}</option>
         {availableOps.map((op) => (
@@ -170,7 +169,7 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
         ))}
       </select>
       {selectedOp?.description && (
-        <p className="text-[10px] text-slate-500 mt-0.5">{selectedOp.description}</p>
+        <p className="text-[10px] text-fg4 mt-0.5">{selectedOp.description}</p>
       )}
       {selectedOp?.method && selectedOp?.path && (
         <p className="text-[10px] text-blue-400 mt-0.5">{selectedOp.method} {selectedOp.path}</p>
@@ -189,15 +188,15 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
       return (
         <div>
           <FieldLabel label="Parameters" tooltip={TIPS.params} />
-          <div className="space-y-1.5 bg-slate-750 rounded p-2 border border-slate-600">
+          <div className="space-y-1.5 bg-card rounded p-2 border border-edge2">
             {paramKeys.map((key) => {
               const schema = selectedOp!.params_schema![key];
               const desc = typeof schema === "object" ? schema.description : schema;
               return (
                 <div key={key}>
-                  <label className="block text-[10px] text-slate-400">
+                  <label className="block text-[10px] text-fg3">
                     {key}
-                    {desc && <span className="ml-1 text-slate-500">— {desc}</span>}
+                    {desc && <span className="ml-1 text-fg4">— {desc}</span>}
                   </label>
                   <input
                     type="text"
@@ -207,13 +206,13 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
                       update("action.params", updated);
                     }}
                     placeholder={`{{ alert.${key} }}`}
-                    className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-2 py-1 bg-inset border border-edge2 rounded text-xs text-fg focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
               );
             })}
           </div>
-          <p className="text-[10px] text-slate-500 mt-1">Use Jinja2 syntax for dynamic values</p>
+          <p className="text-[10px] text-fg4 mt-1">Use Jinja2 syntax for dynamic values</p>
         </div>
       );
     }
@@ -227,7 +226,7 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
       <select
         value={step.human_task?.assignee_role || ""}
         onChange={(e) => update("human_task.assignee_role", e.target.value)}
-        className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs text-white"
+        className="w-full px-2 py-1 bg-inset border border-edge2 rounded text-xs text-fg"
       >
         <option value="">Select a role...</option>
         {["admin", "soc_l1", "soc_l2", "soc_l3", "ir_lead"].map((r) => (
@@ -238,10 +237,10 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
   );
 
   return (
-    <div className="w-80 bg-slate-800 border-l border-slate-700 p-4 overflow-y-auto">
+    <div className="w-80 bg-card border-l border-edge p-4 overflow-y-auto">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-white">Step Configuration</h3>
-        <button onClick={onClose} className="text-slate-400 hover:text-white"><X size={16} /></button>
+        <h3 className="text-sm font-semibold text-fg">Step Configuration</h3>
+        <button onClick={onClose} className="text-fg3 hover:text-fg"><X size={16} /></button>
       </div>
 
       <div className="space-y-3">
@@ -253,7 +252,7 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
           <select
             value={step.type}
             onChange={(e) => update("type", e.target.value)}
-            className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs text-white"
+            className="w-full px-2 py-1 bg-inset border border-edge2 rounded text-xs text-fg"
           >
             {["action", "condition", "human_task", "transform", "parallel"].map((t) => (
               <option key={t} value={t}>{t}</option>
@@ -292,7 +291,7 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
           </>
         )}
 
-        <hr className="border-slate-700" />
+        <hr className="border-edge" />
 
         {stepSelect("On Success", TIPS.onSuccess, step.on_success || "", "on_success")}
         {stepSelect("On Failure", TIPS.onFailure, step.on_failure || "", "on_failure")}
@@ -300,7 +299,7 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
         {field("Retry Max Attempts", TIPS.retryMax, String(step.retry?.max_attempts || ""), "retry.max_attempts", "number")}
         {field("Retry Backoff (seconds)", TIPS.retryBackoff, String(step.retry?.backoff_seconds || ""), "retry.backoff_seconds", "number")}
 
-        <hr className="border-slate-700" />
+        <hr className="border-edge" />
         <button onClick={onDelete} className="w-full py-1.5 bg-red-600/20 text-red-400 border border-red-600/30 rounded text-xs hover:bg-red-600/30">
           Delete Step
         </button>

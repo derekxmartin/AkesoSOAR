@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { cn } from "../lib/utils";
 
-// Subset of MITRE ATT&CK techniques (matches the backend mitre_coverage.py)
 const TECHNIQUES: Record<string, { name: string; tactics: string[] }> = {
   T1059: { name: "Command and Scripting Interpreter", tactics: ["TA0002"] },
   "T1059.001": { name: "PowerShell", tactics: ["TA0002"] },
@@ -66,7 +65,6 @@ export default function MitrePicker({ selectedTactics, selectedTechniques, onTac
       onTechniquesChange(selectedTechniques.filter((x) => x !== id));
     } else {
       onTechniquesChange([...selectedTechniques, id]);
-      // Auto-add parent tactics
       for (const tactic of t.tactics) {
         if (!selectedTactics.includes(tactic)) {
           onTacticsChange([...selectedTactics, tactic]);
@@ -82,7 +80,7 @@ export default function MitrePicker({ selectedTactics, selectedTechniques, onTac
         placeholder="Search techniques (e.g., T1110, Brute Force)..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="w-full px-3 py-2 bg-inset border border-edge2 rounded text-sm text-fg placeholder-fg3 focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
       <div className="max-h-64 overflow-y-auto space-y-1">
         {filteredTechniques.map(([id, t]) => (
@@ -90,7 +88,7 @@ export default function MitrePicker({ selectedTactics, selectedTechniques, onTac
             key={id}
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded cursor-pointer text-sm",
-              selectedTechniques.includes(id) ? "bg-blue-600/20 text-blue-300" : "hover:bg-slate-700/50 text-slate-300"
+              selectedTechniques.includes(id) ? "bg-blue-600/20 text-blue-300" : "hover:bg-hover-row text-fg2"
             )}
           >
             <input
@@ -99,14 +97,14 @@ export default function MitrePicker({ selectedTactics, selectedTechniques, onTac
               onChange={() => toggleTechnique(id)}
               className="rounded"
             />
-            <span className="font-mono text-xs text-slate-400 w-20">{id}</span>
+            <span className="font-mono text-xs text-fg3 w-20">{id}</span>
             <span>{t.name}</span>
-            <span className="ml-auto text-xs text-slate-500">{t.tactics.map((ta) => TACTICS[ta]).join(", ")}</span>
+            <span className="ml-auto text-xs text-fg4">{t.tactics.map((ta) => TACTICS[ta]).join(", ")}</span>
           </label>
         ))}
       </div>
       {selectedTechniques.length > 0 && (
-        <div className="text-xs text-slate-400">
+        <div className="text-xs text-fg3">
           {selectedTechniques.length} technique(s) selected | Tactics: {selectedTactics.join(", ")}
         </div>
       )}

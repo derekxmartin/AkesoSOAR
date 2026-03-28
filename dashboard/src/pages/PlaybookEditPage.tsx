@@ -70,7 +70,7 @@ export default function PlaybookEditPage() {
   return (
     <div>
       <div className="flex items-center gap-4 mb-6">
-        <button onClick={() => navigate(isNew ? "/playbooks" : `/playbooks/${id}`)} className="text-slate-400 hover:text-white">
+        <button onClick={() => navigate(isNew ? "/playbooks" : `/playbooks/${id}`)} className="text-fg3 hover:text-fg">
           <ArrowLeft size={20} />
         </button>
         <h1 className="text-2xl font-bold">{isNew ? "New Playbook" : `Edit: ${existing?.name || ""}`}</h1>
@@ -79,27 +79,27 @@ export default function PlaybookEditPage() {
       <div className="space-y-4 mb-6">
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm text-slate-300 mb-1">Name</label>
+            <label className="block text-sm text-fg2 mb-1">Name</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-inset border border-edge2 rounded text-sm text-fg focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-300 mb-1">Description</label>
+            <label className="block text-sm text-fg2 mb-1">Description</label>
             <input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-inset border border-edge2 rounded text-sm text-fg focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-300 mb-1">Trigger Type</label>
+            <label className="block text-sm text-fg2 mb-1">Trigger Type</label>
             <select
               value={triggerType}
               onChange={(e) => setTriggerType(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded text-sm text-white"
+              className="w-full px-3 py-2 bg-inset border border-edge2 rounded text-sm text-fg"
             >
               <option value="manual">Manual</option>
               <option value="alert">Alert</option>
@@ -116,7 +116,7 @@ export default function PlaybookEditPage() {
       <button
         onClick={handleSave}
         disabled={saving || !name}
-        className="mt-4 flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 rounded-md font-medium transition-colors"
+        className="mt-4 flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 rounded-md font-medium text-white transition-colors"
       >
         <Save size={16} /> {saving ? "Saving..." : isNew ? "Create Playbook" : "Save Changes"}
       </button>
