@@ -13,6 +13,8 @@ import PlaybookEditPage from "./pages/PlaybookEditPage";
 import Playbooks from "./pages/Playbooks";
 import UseCaseDetail from "./pages/UseCaseDetail";
 import UseCaseEditor from "./pages/UseCaseEditor";
+import MitreCoverage from "./pages/MitreCoverage";
+import UseCaseBoard from "./pages/UseCaseBoard";
 import UseCases from "./pages/UseCases";
 
 const queryClient = new QueryClient({
@@ -42,7 +44,8 @@ export default function App() {
                 <Route path="executions" element={<Executions />} />
                 <Route path="executions/:id" element={<ExecutionView />} />
                 <Route path="alerts" element={<Placeholder title="Alerts" />} />
-                <Route path="coverage" element={<Placeholder title="MITRE Coverage" />} />
+                <Route path="use-cases/board" element={<UseCaseBoard />} />
+                <Route path="coverage" element={<MitreCoverage />} />
                 <Route path="connectors" element={<Placeholder title="Connectors" />} />
                 <Route path="audit-log" element={<Placeholder title="Audit Log" />} />
                 <Route path="settings" element={<Placeholder title="Settings" />} />

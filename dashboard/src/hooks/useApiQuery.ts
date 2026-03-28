@@ -1,13 +1,14 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "../lib/api";
 
-export function useApiGet<T>(key: string[], url: string, params?: Record<string, any>) {
+export function useApiGet<T>(key: string[], url: string, params?: Record<string, any>, queryOpts?: { refetchInterval?: number; enabled?: boolean }) {
   return useQuery<T>({
     queryKey: [...key, params],
     queryFn: async () => {
       const { data } = await api.get(url, { params });
       return data;
     },
+    ...queryOpts,
   });
 }
 

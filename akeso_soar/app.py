@@ -13,6 +13,7 @@ from akeso_soar.api.connectors import router as connectors_router
 from akeso_soar.api.coverage import router as coverage_router
 from akeso_soar.api.executions import router as executions_router
 from akeso_soar.api.human_tasks import router as human_tasks_router
+from akeso_soar.api.metrics import router as metrics_router
 from akeso_soar.api.playbooks import router as playbooks_router
 from akeso_soar.api.use_cases import router as use_cases_router
 from akeso_soar.api.users import router as users_router
@@ -62,6 +63,7 @@ def create_app() -> FastAPI:
     app.include_router(connectors_router)
     app.include_router(coverage_router)
     app.include_router(human_tasks_router)
+    app.include_router(metrics_router)
     app.include_router(ws_router)
 
     @app.get("/api/v1/health")

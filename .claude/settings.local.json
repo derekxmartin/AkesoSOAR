@@ -42,7 +42,10 @@
       "Bash(python -c \"from akeso_soar.app import create_app; print\\(''OK''\\)\")",
       "Bash(.venv/Scripts/pip install:*)",
       "Bash(.venv/Scripts/python.exe -m pip install jinja2)",
-      "Bash(.venv/Scripts/python.exe -c \"from akeso_soar.app import create_app; print\\(''OK''\\)\")"
+      "Bash(.venv/Scripts/python.exe -c \"from akeso_soar.app import create_app; print\\(''OK''\\)\")",
+      "WebSearch",
+      "WebFetch(domain:attack.mitre.org)",
+      "Bash(.venv/Scripts/python.exe -c \":*)"
     ]
   }
 }
