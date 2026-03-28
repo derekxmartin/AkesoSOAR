@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import api from "../lib/api";
+import { FieldLabel } from "./Tooltip";
 
 interface Step {
   id: string;
@@ -33,6 +34,29 @@ interface Props {
   allStepIds: string[];
 }
 
+/* ── tooltip text for every field ── */
+const TIPS = {
+  stepId: "Unique identifier for this step. Used in on_success/on_failure routing and Jinja2 references like {{ steps.<id>.result }}.",
+  name: "Human-readable label displayed on the graph node. Does not affect execution.",
+  type: "Determines what this step does: action (call a connector), condition (branch on expression), human_task (wait for manual approval), transform (reshape data), or parallel (run branches concurrently).",
+  connector: "The integration this step calls. Each connector represents an Akeso product or external service (SIEM, EDR, Firewall, etc.).",
+  operation: "The specific action to invoke on the selected connector. Available operations depend on the connector chosen above.",
+  params: "Input values passed to the operation. Use Jinja2 templates like {{ alert.source_ip }} or {{ steps.prev_step.result.field }} to reference dynamic data.",
+  expression: "A Jinja2 expression that evaluates to true or false. Example: {{ alert.severity == 'critical' }} or {{ steps.enrich.result.score > 7 }}.",
+  trueBranch: "The step to execute when the condition evaluates to true.",
+  falseBranch: "The step to execute when the condition evaluates to false.",
+  prompt: "The message shown to the analyst when this step is reached. Should clearly describe what action or decision is needed.",
+  assigneeRole: "The SOC role that can approve this task. Only users with this role will see it in their pending tasks queue.",
+  timeoutHours: "Hours to wait for approval before the step times out. After timeout, the on_failure path is taken.",
+  transformExpr: "A Jinja2 expression that reshapes or extracts data. The result is stored in the output variable. Example: {{ steps.enrich.result.indicators | selectattr('malicious') | list }}.",
+  outputVar: "Variable name to store the transform result. Access it in later steps as {{ steps.<step_id>.result.<output_var> }}.",
+  onSuccess: "The next step to execute when this step completes successfully. Select 'None' to end the playbook, or 'Abort' to stop with an error.",
+  onFailure: "The step to execute if this step fails (error, timeout, or rejection). Useful for rollback or escalation flows.",
+  timeout: "Maximum seconds this step can run before it's considered failed. The on_failure path is taken after timeout. Leave empty for no limit.",
+  retryMax: "Number of times to retry this step on failure before giving up. Set to 0 or leave empty for no retries.",
+  retryBackoff: "Seconds to wait between retry attempts. Each retry waits this long before trying again.",
+};
+
 export default function StepConfigPanel({ step, onChange, onClose, onDelete, allStepIds }: Props) {
   const [connectors, setConnectors] = useState<ConnectorInfo[]>([]);
   const [loadingConnectors, setLoadingConnectors] = useState(false);
@@ -58,9 +82,9 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
     onChange(clone);
   };
 
-  const field = (label: string, value: string, path: string, type: "text" | "textarea" | "number" = "text") => (
+  const field = (label: string, tooltip: string, value: string, path: string, type: "text" | "textarea" | "number" = "text") => (
     <div>
-      <label className="block text-xs text-slate-400 mb-1">{label}</label>
+      <FieldLabel label={label} tooltip={tooltip} />
       {type === "textarea" ? (
         <textarea
           value={value || ""}
@@ -79,9 +103,9 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
     </div>
   );
 
-  const stepSelect = (label: string, value: string, path: string) => (
+  const stepSelect = (label: string, tooltip: string, value: string, path: string) => (
     <div>
-      <label className="block text-xs text-slate-400 mb-1">{label}</label>
+      <FieldLabel label={label} tooltip={tooltip} />
       <select
         value={value || ""}
         onChange={(e) => update(path, e.target.value || undefined)}
@@ -98,7 +122,7 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
 
   const connectorSelect = () => (
     <div>
-      <label className="block text-xs text-slate-400 mb-1">Connector</label>
+      <FieldLabel label="Connector" tooltip={TIPS.connector} />
       <select
         value={step.action?.connector || ""}
         onChange={(e) => {
@@ -120,13 +144,12 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
 
   const operationSelect = () => (
     <div>
-      <label className="block text-xs text-slate-400 mb-1">Operation</label>
+      <FieldLabel label="Operation" tooltip={TIPS.operation} />
       <select
         value={step.action?.operation || ""}
         onChange={(e) => {
           const opName = e.target.value;
           update("action.operation", opName);
-          // Auto-populate params template from schema
           if (opName && selectedConnector) {
             const op = selectedConnector.operations[opName];
             if (op?.params_schema) {
@@ -165,7 +188,7 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
     if (paramKeys.length > 0) {
       return (
         <div>
-          <label className="block text-xs text-slate-400 mb-1">Parameters</label>
+          <FieldLabel label="Parameters" tooltip={TIPS.params} />
           <div className="space-y-1.5 bg-slate-750 rounded p-2 border border-slate-600">
             {paramKeys.map((key) => {
               const schema = selectedOp!.params_schema![key];
@@ -195,13 +218,12 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
       );
     }
 
-    // Fallback to raw JSON textarea if no schema
-    return field("Params (JSON)", JSON.stringify(currentParams, null, 2), "action.params", "textarea");
+    return field("Params (JSON)", TIPS.params, JSON.stringify(currentParams, null, 2), "action.params", "textarea");
   };
 
   const roleSelect = () => (
     <div>
-      <label className="block text-xs text-slate-400 mb-1">Assignee Role</label>
+      <FieldLabel label="Assignee Role" tooltip={TIPS.assigneeRole} />
       <select
         value={step.human_task?.assignee_role || ""}
         onChange={(e) => update("human_task.assignee_role", e.target.value)}
@@ -223,11 +245,11 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
       </div>
 
       <div className="space-y-3">
-        {field("Step ID", step.id, "id")}
-        {field("Name", step.name, "name")}
+        {field("Step ID", TIPS.stepId, step.id, "id")}
+        {field("Name", TIPS.name, step.name, "name")}
 
         <div>
-          <label className="block text-xs text-slate-400 mb-1">Type</label>
+          <FieldLabel label="Type" tooltip={TIPS.type} />
           <select
             value={step.type}
             onChange={(e) => update("type", e.target.value)}
@@ -249,34 +271,34 @@ export default function StepConfigPanel({ step, onChange, onClose, onDelete, all
 
         {step.type === "condition" && (
           <>
-            {field("Expression", step.condition?.expression || "", "condition.expression")}
-            {stepSelect("True Branch", step.condition?.branches?.["true"] || "", "condition.branches.true")}
-            {stepSelect("False Branch", step.condition?.branches?.["false"] || "", "condition.branches.false")}
+            {field("Expression", TIPS.expression, step.condition?.expression || "", "condition.expression")}
+            {stepSelect("True Branch", TIPS.trueBranch, step.condition?.branches?.["true"] || "", "condition.branches.true")}
+            {stepSelect("False Branch", TIPS.falseBranch, step.condition?.branches?.["false"] || "", "condition.branches.false")}
           </>
         )}
 
         {step.type === "human_task" && (
           <>
-            {field("Prompt", step.human_task?.prompt || "", "human_task.prompt", "textarea")}
+            {field("Prompt", TIPS.prompt, step.human_task?.prompt || "", "human_task.prompt", "textarea")}
             {roleSelect()}
-            {field("Timeout (hours)", String(step.human_task?.timeout_hours || 4), "human_task.timeout_hours", "number")}
+            {field("Timeout (hours)", TIPS.timeoutHours, String(step.human_task?.timeout_hours || 4), "human_task.timeout_hours", "number")}
           </>
         )}
 
         {step.type === "transform" && (
           <>
-            {field("Expression", step.transform?.expression || "", "transform.expression", "textarea")}
-            {field("Output Var", step.transform?.output_var || "", "transform.output_var")}
+            {field("Expression", TIPS.transformExpr, step.transform?.expression || "", "transform.expression", "textarea")}
+            {field("Output Var", TIPS.outputVar, step.transform?.output_var || "", "transform.output_var")}
           </>
         )}
 
         <hr className="border-slate-700" />
 
-        {stepSelect("On Success", step.on_success || "", "on_success")}
-        {stepSelect("On Failure", step.on_failure || "", "on_failure")}
-        {field("Timeout (seconds)", String(step.timeout_seconds || ""), "timeout_seconds", "number")}
-        {field("Retry Max Attempts", String(step.retry?.max_attempts || ""), "retry.max_attempts", "number")}
-        {field("Retry Backoff (seconds)", String(step.retry?.backoff_seconds || ""), "retry.backoff_seconds", "number")}
+        {stepSelect("On Success", TIPS.onSuccess, step.on_success || "", "on_success")}
+        {stepSelect("On Failure", TIPS.onFailure, step.on_failure || "", "on_failure")}
+        {field("Timeout (seconds)", TIPS.timeout, String(step.timeout_seconds || ""), "timeout_seconds", "number")}
+        {field("Retry Max Attempts", TIPS.retryMax, String(step.retry?.max_attempts || ""), "retry.max_attempts", "number")}
+        {field("Retry Backoff (seconds)", TIPS.retryBackoff, String(step.retry?.backoff_seconds || ""), "retry.backoff_seconds", "number")}
 
         <hr className="border-slate-700" />
         <button onClick={onDelete} className="w-full py-1.5 bg-red-600/20 text-red-400 border border-red-600/30 rounded text-xs hover:bg-red-600/30">
