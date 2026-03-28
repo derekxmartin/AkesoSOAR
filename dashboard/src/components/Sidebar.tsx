@@ -11,7 +11,7 @@ import {
   Shield,
   X,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { cn } from "../lib/utils";
 
 const NAV_ITEMS = [
@@ -45,7 +45,7 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
         )}
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-edge">
-          <span className="text-lg font-bold text-fg">AkesoSOAR</span>
+          <Link to="/" className="text-lg font-bold text-fg hover:text-blue-400 transition-colors">AkesoSOAR</Link>
           <button onClick={onToggle} className="lg:hidden text-fg3 hover:text-fg">
             <X size={20} />
           </button>

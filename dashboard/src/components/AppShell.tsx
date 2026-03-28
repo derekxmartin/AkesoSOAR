@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import CommandPalette from "./CommandPalette";
 import NotificationCenter from "./NotificationCenter";
 import Sidebar from "./Sidebar";
 
@@ -61,6 +62,8 @@ export default function AppShell() {
         <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>
+
+        <CommandPalette />
       </div>
     </div>
   );
