@@ -22,11 +22,13 @@ async def websocket_endpoint(
     token: str = Query(...),
     rooms: str = Query(default=ROOM_GLOBAL),
 ):
-    # Authenticate before accepting
+    # Authenticate BEFORE accepting — reject silently if invalid
     try:
         payload = decode_token(token)
     except (JWTError, Exception):
+        # Must accept first to send a close frame per the WS spec
         await ws.accept()
+        await ws.send_text(json.dumps({"type": "error", "code": 4001, "reason": "Invalid or expired token"}))
         await ws.close(code=4001, reason="Invalid or expired token")
         return
 
