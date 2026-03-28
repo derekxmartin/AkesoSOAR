@@ -1,5 +1,6 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useApiGet } from "../hooks/useApiQuery";
+import usePageTitle from "../hooks/usePageTitle";
 import Badge from "../components/ui/Badge";
 import { Plus } from "lucide-react";
 
@@ -25,6 +26,7 @@ const STATUSES = ["", "draft", "testing", "production", "deprecated"];
 const SEVERITIES = ["", "critical", "high", "medium", "low", "informational"];
 
 export default function UseCases() {
+  usePageTitle("Use Cases");
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
 

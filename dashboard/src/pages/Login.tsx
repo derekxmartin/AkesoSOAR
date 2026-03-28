@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import usePageTitle from "../hooks/usePageTitle";
 
 export default function Login() {
+  usePageTitle("Sign In");
   const { login } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");

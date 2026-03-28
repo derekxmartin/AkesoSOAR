@@ -1,4 +1,7 @@
+import usePageTitle from "../hooks/usePageTitle";
+
 export default function Placeholder({ title }: { title: string }) {
+  usePageTitle(title);
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">{title}</h1>

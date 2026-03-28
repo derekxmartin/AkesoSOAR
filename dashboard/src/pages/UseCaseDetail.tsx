@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Badge from "../components/ui/Badge";
 import { useApiGet } from "../hooks/useApiQuery";
+import usePageTitle from "../hooks/usePageTitle";
 import { cn } from "../lib/utils";
 
 interface UseCase {
@@ -79,6 +80,8 @@ export default function UseCaseDetail() {
     { resource_type: "use_case", resource_id: id }
   );
   const { data: playbooks } = useApiGet<any[]>(["uc-playbooks", id!], `/use-cases/${id}/playbooks`);
+
+  usePageTitle(uc?.name ? `${uc.name} — Use Case` : "Use Case");
 
   if (isLoading || !uc) return <div className="text-fg3">Loading...</div>;
 

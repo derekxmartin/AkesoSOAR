@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Badge from "../components/ui/Badge";
 import { useApiGet } from "../hooks/useApiQuery";
+import usePageTitle from "../hooks/usePageTitle";
 import api from "../lib/api";
 
 interface Playbook {
@@ -22,6 +23,7 @@ interface PaginatedResponse {
 }
 
 export default function Playbooks() {
+  usePageTitle("Playbooks");
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
 

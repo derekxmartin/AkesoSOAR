@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import PlaybookGraph from "../components/PlaybookGraph";
 import Badge from "../components/ui/Badge";
 import { useApiGet } from "../hooks/useApiQuery";
+import usePageTitle from "../hooks/usePageTitle";
 import api from "../lib/api";
 
 export default function PlaybookDetail() {
@@ -22,6 +23,8 @@ export default function PlaybookDetail() {
       setExecuting(false);
     }
   };
+
+  usePageTitle(pb?.name ? `${pb.name} — Playbook` : "Playbook");
 
   if (isLoading || !pb) return <div className="text-fg3">Loading...</div>;
 

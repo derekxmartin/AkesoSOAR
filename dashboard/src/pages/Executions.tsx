@@ -1,6 +1,7 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Badge from "../components/ui/Badge";
 import { useApiGet } from "../hooks/useApiQuery";
+import usePageTitle from "../hooks/usePageTitle";
 
 interface Execution {
   id: string;
@@ -15,6 +16,7 @@ interface Execution {
 }
 
 export default function Executions() {
+  usePageTitle("Executions");
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const page = parseInt(params.get("page") || "1");

@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import MitrePicker from "../components/MitrePicker";
 import Badge from "../components/ui/Badge";
 import { useApiGet } from "../hooks/useApiQuery";
+import usePageTitle from "../hooks/usePageTitle";
 import api from "../lib/api";
 
 const SEVERITIES = ["critical", "high", "medium", "low", "informational"];
@@ -13,6 +14,8 @@ export default function UseCaseEditor() {
   const { id } = useParams<{ id: string }>();
   const isNew = !id || id === "new";
   const navigate = useNavigate();
+
+  usePageTitle(isNew ? "New Use Case" : `Edit Use Case`);
 
   const { data: existing } = useApiGet<any>(
     ["use-case", id!],

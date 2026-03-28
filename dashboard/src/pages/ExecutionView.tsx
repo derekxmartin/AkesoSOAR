@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import PlaybookGraph from "../components/PlaybookGraph";
 import Badge from "../components/ui/Badge";
 import { useApiGet } from "../hooks/useApiQuery";
+import usePageTitle from "../hooks/usePageTitle";
 
 interface StepResult {
   id: string;
@@ -55,6 +56,8 @@ export default function ExecutionView() {
     }
     return map;
   }, [execution]);
+
+  usePageTitle(`Execution ${execution?.id?.slice(0, 8) ?? ""}`);
 
   if (isLoading || !execution) return <div className="text-fg3">Loading...</div>;
 

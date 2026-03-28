@@ -1,7 +1,9 @@
 import { useApiGet } from "../hooks/useApiQuery";
+import usePageTitle from "../hooks/usePageTitle";
 import Badge from "../components/ui/Badge";
 
 export default function Dashboard() {
+  usePageTitle("Dashboard");
   const { data: ucData } = useApiGet<any>(["use-cases-dash"], "/use-cases", { limit: 5 });
   const { data: execData } = useApiGet<any>(["executions-dash"], "/executions", { limit: 5 });
   const { data: alertData } = useApiGet<any>(["alerts-dash"], "/alerts", { limit: 5 });

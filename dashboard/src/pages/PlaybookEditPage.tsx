@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PlaybookEditor from "../components/PlaybookEditor";
 import { useApiGet } from "../hooks/useApiQuery";
+import usePageTitle from "../hooks/usePageTitle";
 import api from "../lib/api";
 
 export default function PlaybookEditPage() {
   const { id } = useParams<{ id: string }>();
   const isNew = !id || id === "new";
   const navigate = useNavigate();
+
+  usePageTitle(isNew ? "New Playbook" : "Edit Playbook");
 
   const { data: existing } = useApiGet<any>(["playbook", id!], `/playbooks/${id}`);
 
