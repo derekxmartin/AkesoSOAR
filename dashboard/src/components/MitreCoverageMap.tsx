@@ -112,7 +112,7 @@ export default function MitreCoverageMap() {
           }}
           className="bg-app border border-edge rounded-lg shadow-xl p-3 text-xs w-56 pointer-events-none"
         >
-          <div className="font-mono text-fg font-bold">{tooltipTech.tech.technique_id}</div>
+          <div className="font-mono text-blue-400 font-bold">{tooltipTech.tech.technique_id}</div>
           <div className="text-fg2 mt-0.5">{tooltipTech.tech.technique_name}</div>
           <div className="text-fg4 mt-1">
             {tooltipTech.tech.count} use case{tooltipTech.tech.count !== 1 ? "s" : ""}
@@ -129,7 +129,14 @@ export default function MitreCoverageMap() {
         <div className="bg-card-a rounded-lg border border-edge p-4">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <span className="font-mono text-sm font-bold text-fg">{selectedTech.technique_id}</span>
+              <a
+                href={`https://attack.mitre.org/techniques/${selectedTech.technique_id.replace(".", "/")}/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-sm font-bold text-blue-400 hover:underline"
+              >
+                {selectedTech.technique_id} ↗
+              </a>
               <span className="text-fg2 ml-2">{selectedTech.technique_name}</span>
             </div>
             <button onClick={() => setSelectedTech(null)} className="text-fg3 hover:text-fg text-xs">
