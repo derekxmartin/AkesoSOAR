@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import NotificationCenter from "./NotificationCenter";
 import Sidebar from "./Sidebar";
 
 export default function AppShell() {
@@ -29,6 +30,8 @@ export default function AppShell() {
           <div className="flex-1" />
 
           <div className="flex items-center gap-4">
+            <NotificationCenter />
+
             <button
               onClick={toggle}
               className="p-1.5 rounded-md text-fg3 hover:text-fg hover:bg-hover transition-colors"

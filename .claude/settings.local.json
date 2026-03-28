@@ -38,7 +38,11 @@
       "Bash(grep -r \"siem\\\\|slack\\\\|github\\\\|servicenow\" /c/Users/derek/Desktop/Projects/controls/AkesoSOAR --include=*.py --include=*.ts)",
       "Bash(grep -A 50 connector /c/Users/derek/Desktop/Projects/controls/AkesoSOAR/alembic/versions/*seed*)",
       "Bash(find /c/Users/derek/Desktop/Projects/controls/AkesoSOAR -name schemas.py -o -name types.py -o -name *.pydantic)",
-      "Bash(grep -r \"class.*Connector\\\\|class.*Operation\" /c/Users/derek/Desktop/Projects/controls/AkesoSOAR/akeso_soar --include=*.py)"
+      "Bash(grep -r \"class.*Connector\\\\|class.*Operation\" /c/Users/derek/Desktop/Projects/controls/AkesoSOAR/akeso_soar --include=*.py)",
+      "Bash(python -c \"from akeso_soar.app import create_app; print\\(''OK''\\)\")",
+      "Bash(.venv/Scripts/pip install:*)",
+      "Bash(.venv/Scripts/python.exe -m pip install jinja2)",
+      "Bash(.venv/Scripts/python.exe -c \"from akeso_soar.app import create_app; print\\(''OK''\\)\")"
     ]
   }
 }

@@ -14,6 +14,7 @@ from akeso_soar.engine.rollback_handler import execute_rollbacks
 from akeso_soar.engine.variable_resolver import resolve_params, resolve_string
 from akeso_soar.models.enums import ExecutionStatus, StepStatus
 from akeso_soar.models.execution import Execution, StepResult
+from akeso_soar.services.human_task_service import create_human_task
 
 # ---------------------------------------------------------------------------
 # Mock action registry
@@ -340,19 +341,41 @@ async def execute_playbook(
 
         # --- Human task ---
         if step_type == "human_task":
+            ht_config = step_def.get("human_task", {})
+            prompt = ht_config.get("prompt", "Approval required")
+            assignee_role = ht_config.get("assignee_role", "soc_l2")
+            timeout_hours = ht_config.get("timeout_hours", 4)
+
+            # Resolve Jinja2 in the prompt
+            try:
+                prompt = resolve_string(prompt, context)
+            except Exception:
+                pass
+
             sr = StepResult(
                 execution_id=execution.id,
                 step_id=current_step_id,
                 status=StepStatus.WAITING,
                 started_at=datetime.now(UTC),
-                completed_at=datetime.now(UTC),
-                duration_ms=0,
-                output_data={"note": "Human approval gates require Phase 11"},
+                output_data={"prompt": prompt, "assignee_role": assignee_role},
             )
             db.add(sr)
             await db.flush()
-            current_step_id = None
-            continue
+
+            # Create the human task record and pause execution
+            await create_human_task(
+                db,
+                execution_id=execution.id,
+                step_id=current_step_id,
+                prompt=prompt,
+                assignee_role=assignee_role,
+                timeout_hours=timeout_hours,
+            )
+
+            # Stop DAG traversal — execution is paused until approve/reject
+            execution.status = ExecutionStatus.PAUSED
+            await db.flush()
+            return execution
 
         # --- Action / Transform (with retry + timeout) ---
         sr_data = await _run_step_logic(current_step_id, step_def, context)

@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from akeso_soar.api.auth import require_user
-from akeso_soar.db import get_session
+from akeso_soar.api.rbac import require_auth
+from akeso_soar.dependencies import get_db
 from akeso_soar.models.connector import Connector
 
 router = APIRouter(prefix="/api/v1/connectors", tags=["connectors"])
@@ -15,8 +15,8 @@ router = APIRouter(prefix="/api/v1/connectors", tags=["connectors"])
 
 @router.get("")
 async def list_connectors(
-    _user=Depends(require_user),
-    session: AsyncSession = Depends(get_session),
+    _user=Depends(require_auth),
+    session: AsyncSession = Depends(get_db),
 ):
     """Return all connectors with their available operations."""
     result = await session.execute(
