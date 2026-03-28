@@ -2,6 +2,7 @@ import {
   AlertTriangle,
   BarChart3,
   BookOpen,
+  Columns3,
   GitBranch,
   LayoutDashboard,
   Play,
@@ -16,6 +17,7 @@ import { cn } from "../lib/utils";
 const NAV_ITEMS = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/use-cases", icon: BookOpen, label: "Use Cases" },
+  { to: "/use-cases/board", icon: Columns3, label: "UC Board" },
   { to: "/playbooks", icon: GitBranch, label: "Playbooks" },
   { to: "/executions", icon: Play, label: "Executions" },
   { to: "/alerts", icon: AlertTriangle, label: "Alerts" },
