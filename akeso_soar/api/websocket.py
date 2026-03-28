@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+import asyncio
+import json
+
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
 from jose import JWTError
 
+from akeso_soar.logging import get_logger
 from akeso_soar.services.auth import decode_token
 from akeso_soar.services.ws_manager import ROOM_GLOBAL, ws_manager
 
+logger = get_logger(__name__)
 router = APIRouter()
 
 
@@ -17,16 +22,11 @@ async def websocket_endpoint(
     token: str = Query(...),
     rooms: str = Query(default=ROOM_GLOBAL),
 ):
-    """WebSocket endpoint with JWT auth via query param.
-
-    Query params:
-      token  — valid access JWT
-      rooms  — comma-separated room names (default: "global")
-    """
-    # Authenticate
+    # Authenticate before accepting
     try:
         payload = decode_token(token)
     except (JWTError, Exception):
+        await ws.accept()
         await ws.close(code=4001, reason="Invalid or expired token")
         return
 
@@ -39,18 +39,21 @@ async def websocket_endpoint(
 
     try:
         while True:
-            # Keep connection alive; handle client messages if needed
             data = await ws.receive_text()
-            # Client can send {"subscribe": "execution:<id>"} to join a room
             try:
-                import json
                 msg = json.loads(data)
                 if "subscribe" in msg:
                     await ws_manager.subscribe(ws, msg["subscribe"])
                     await ws.send_text(json.dumps({"type": "subscribed", "room": msg["subscribe"]}))
-            except Exception:
+                elif msg.get("type") == "ping":
+                    await ws.send_text(json.dumps({"type": "pong"}))
+            except (json.JSONDecodeError, KeyError):
                 pass
     except WebSocketDisconnect:
-        await ws_manager.disconnect(ws)
-    except Exception:
+        pass
+    except asyncio.CancelledError:
+        pass
+    except Exception as exc:
+        logger.warning("ws.error", error=str(exc))
+    finally:
         await ws_manager.disconnect(ws)
