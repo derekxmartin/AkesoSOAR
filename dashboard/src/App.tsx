@@ -10,6 +10,7 @@ import ExecutionView from "./pages/ExecutionView";
 import Executions from "./pages/Executions";
 import Login from "./pages/Login";
 import MitreCoverage from "./pages/MitreCoverage";
+import NotFound from "./pages/NotFound";
 import Placeholder from "./pages/Placeholder";
 import PlaybookDetail from "./pages/PlaybookDetail";
 import PlaybookEditPage from "./pages/PlaybookEditPage";
@@ -53,7 +54,9 @@ export default function App() {
                     <Route path="connectors" element={<Placeholder title="Connectors" />} />
                     <Route path="audit-log" element={<Placeholder title="Audit Log" />} />
                     <Route path="settings" element={<Placeholder title="Settings" />} />
+                    <Route path="*" element={<NotFound />} />
                   </Route>
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </ErrorBoundary>
             </AuthProvider>
