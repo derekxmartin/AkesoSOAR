@@ -79,7 +79,7 @@ export default function Dashboard() {
         <StatCard icon={Hand} label="Pending Tasks" value={overview?.pending_human_tasks ?? "—"} color="bg-yellow-500/10 text-yellow-400" />
         <StatCard icon={Clock} label="MTTR" value={overview ? formatMttr(overview.mttr_seconds) : "—"} color="bg-purple-500/10 text-purple-400" />
         <StatCard icon={Shield} label="Coverage" value={overview ? `${overview.coverage_percent}%` : "—"} sub={overview ? `${overview.production_use_cases}/${overview.total_use_cases} UC` : ""} color="bg-green-500/10 text-green-400" />
-        <StatCard icon={CheckCircle} label="Success Rate" value={pbMetrics ? `${pbMetrics.success_rate}%` : "—"} sub={pbMetrics ? `${pbMetrics.successes}/${pbMetrics.total_executions}` : ""} color="bg-emerald-500/10 text-emerald-400" />
+        <StatCard icon={CheckCircle} label="Success" value={pbMetrics ? `${pbMetrics.success_rate}%` : "—"} sub={pbMetrics ? `${pbMetrics.successes}/${pbMetrics.total_executions}` : ""} color="bg-emerald-500/10 text-emerald-400" />
       </div>
 
       {/* Charts row */}
