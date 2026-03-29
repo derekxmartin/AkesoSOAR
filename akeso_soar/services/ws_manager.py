@@ -42,7 +42,7 @@ class ConnectionManager:
         async with self._lock:
             for room in rooms:
                 self._rooms.setdefault(room, set()).add(ws)
-        logger.info("ws.connect", rooms=rooms)
+        logger.debug("ws.connect", rooms=rooms)
 
     async def disconnect(self, ws: WebSocket) -> None:
         """Remove a WebSocket from all rooms."""
@@ -54,7 +54,7 @@ class ConnectionManager:
                     empty_rooms.append(room)
             for room in empty_rooms:
                 del self._rooms[room]
-        logger.info("ws.disconnect")
+        logger.debug("ws.disconnect")
 
     async def subscribe(self, ws: WebSocket, room: str) -> None:
         """Add a WebSocket to an additional room after initial connect."""
