@@ -32,15 +32,23 @@ interface AlertSeverity {
   count: number;
 }
 
+function formatMttr(seconds: number): string {
+  if (seconds < 60) return `${Math.round(seconds)}s`;
+  if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
+  const h = Math.floor(seconds / 3600);
+  const m = Math.round((seconds % 3600) / 60);
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+}
+
 function StatCard({ icon: Icon, label, value, sub, color }: { icon: any; label: string; value: string | number; sub?: string; color?: string }) {
   return (
-    <div className="bg-card-a rounded-lg border border-edge p-5 flex items-start gap-4">
-      <div className={`p-2 rounded-lg ${color || "bg-blue-500/10 text-blue-400"}`}>
+    <div className="bg-card-a rounded-lg border border-edge p-5 flex items-center gap-4 min-w-0">
+      <div className={`p-2 rounded-lg shrink-0 ${color || "bg-blue-500/10 text-blue-400"}`}>
         <Icon size={20} />
       </div>
-      <div>
-        <p className="text-xs font-medium text-fg3 uppercase tracking-wider">{label}</p>
-        <p className="text-2xl font-bold text-fg mt-0.5">{value}</p>
+      <div className="min-w-0">
+        <p className="text-xs font-medium text-fg3 uppercase tracking-wider whitespace-nowrap">{label}</p>
+        <p className="text-2xl font-bold text-fg mt-0.5 truncate">{value}</p>
         {sub && <p className="text-xs text-fg4 mt-0.5">{sub}</p>}
       </div>
     </div>
@@ -69,7 +77,7 @@ export default function Dashboard() {
         <StatCard icon={AlertTriangle} label="Alerts" value={overview?.total_alerts ?? "—"} color="bg-red-500/10 text-red-400" />
         <StatCard icon={Activity} label="Active Runs" value={overview?.active_executions ?? "—"} color="bg-blue-500/10 text-blue-400" />
         <StatCard icon={Hand} label="Pending Tasks" value={overview?.pending_human_tasks ?? "—"} color="bg-yellow-500/10 text-yellow-400" />
-        <StatCard icon={Clock} label="MTTR" value={overview ? `${overview.mttr_seconds}s` : "—"} color="bg-purple-500/10 text-purple-400" />
+        <StatCard icon={Clock} label="MTTR" value={overview ? formatMttr(overview.mttr_seconds) : "—"} color="bg-purple-500/10 text-purple-400" />
         <StatCard icon={Shield} label="Coverage" value={overview ? `${overview.coverage_percent}%` : "—"} sub={overview ? `${overview.production_use_cases}/${overview.total_use_cases} UC` : ""} color="bg-green-500/10 text-green-400" />
         <StatCard icon={CheckCircle} label="Success Rate" value={pbMetrics ? `${pbMetrics.success_rate}%` : "—"} sub={pbMetrics ? `${pbMetrics.successes}/${pbMetrics.total_executions}` : ""} color="bg-emerald-500/10 text-emerald-400" />
       </div>
