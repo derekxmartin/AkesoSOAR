@@ -45,7 +45,11 @@
       "Bash(.venv/Scripts/python.exe -c \"from akeso_soar.app import create_app; print\\(''OK''\\)\")",
       "WebSearch",
       "WebFetch(domain:attack.mitre.org)",
-      "Bash(.venv/Scripts/python.exe -c \":*)"
+      "Bash(.venv/Scripts/python.exe -c \":*)",
+      "Bash(python -m pytest tests/ -x -q)",
+      "Bash(python -m pytest -x -q)",
+      "Bash(python -c \"from akeso_soar.api.connectors import router; print\\(''API router loaded:'', [r.path for r in router.routes]\\)\")",
+      "Bash(python -c \"from akeso_soar.connectors import *; print\\(''All connectors imported successfully''\\); from akeso_soar.connectors import AkesoFWConnector, AkesoDLPConnector, AkesoNDRConnector, AkesoC2Connector, GenericHTTPConnector; print\\(f''FW ops: {AkesoFWConnector\\(\\).operations}''\\); print\\(f''DLP ops: {AkesoDLPConnector\\(\\).operations}''\\); print\\(f''NDR ops: {AkesoNDRConnector\\(\\).operations}''\\); print\\(f''C2 ops: {AkesoC2Connector\\(\\).operations}''\\); print\\(f''HTTP ops: {GenericHTTPConnector\\(\\).operations}''\\)\")"
     ]
   }
 }

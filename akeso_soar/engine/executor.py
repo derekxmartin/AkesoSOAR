@@ -51,6 +51,21 @@ async def _execute_action(connector: str, operation: str, params: dict) -> dict:
         await asyncio.sleep(_mock_delays[key])
     if key in _mock_results:
         return _mock_results[key]
+
+    # --- Try the real connector registry before falling back to generic mock ---
+    try:
+        from akeso_soar.connectors.registry import ConnectorRegistry
+
+        registry = ConnectorRegistry.instance()
+        conn = registry.get_connector(connector)
+        if conn is not None:
+            result = await conn.execute(operation, params)
+            if result.success:
+                return result.data
+            raise RuntimeError(result.error or "Connector returned failure")
+    except ImportError:
+        pass  # registry not available — fall through to generic mock
+
     return {"status": "ok", "connector": connector, "operation": operation, "params": params, "mock": True}
 
 
